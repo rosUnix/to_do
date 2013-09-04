@@ -14,9 +14,8 @@
         <meta name="author" content="Rosa Durante">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
 
-        <!-- <link rel="stylesheet" href="{{ STATIC_URL }}css/styles.css" media="all"> -->
-        <!-- <link rel="stylesheet/less" href="{{ STATIC_URL }}less/styles.less" media="all"> -->
-        <!-- <script src="{{ STATIC_URL }}lib/js/less-1.3.0.min.js"></script> -->
+        <link rel="stylesheet/less" href="{{ STATIC_URL }}styles.less" media="all">
+        <script src="{{ STATIC_URL }}libs/js/less-1.4.1.min.js"></script>
 
     </head>
     <body {% block extra_body_class %}{% endblock %}>
@@ -49,7 +48,7 @@
         </section>
 
         <!-- Loading JS at the end of the page -->
-        <script data-main="{{ STATIC_URL }}js/main" src="{{ STATIC_URL }}lib/js/require.js" charset="utf-8"></script>
+        <script data-main="{{ STATIC_URL }}js/main" src="{{ STATIC_URL }}libs/js/require.min.js" charset="utf-8"></script>
         {% block extrajs %}{% endblock %}
     </body>
 </html>
