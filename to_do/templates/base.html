@@ -1,0 +1,55 @@
+{% load staticfiles %}
+<!doctype html>
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8 ie8less {{not_is_authenticated}}not-{{not_is_authenticated}}authenticated"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9 {{not_is_authenticated}}not-{{not_is_authenticated}}authenticated"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="en" class="no-js {{not_is_authenticated}}not-{{not_is_authenticated}}authenticated">
+<!--<![endif]-->
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+        <title>To-do!</title>
+        <meta name="description" content="">
+        <meta name="author" content="Rosa Durante">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+
+        <!-- <link rel="stylesheet" href="{{ STATIC_URL }}css/styles.css" media="all"> -->
+        <!-- <link rel="stylesheet/less" href="{{ STATIC_URL }}less/styles.less" media="all"> -->
+        <!-- <script src="{{ STATIC_URL }}lib/js/less-1.3.0.min.js"></script> -->
+
+    </head>
+    <body {% block extra_body_class %}{% endblock %}>
+        {% include "header.inc.html" %}
+
+        {% if has_messages %}
+        <section class="messages">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+        </section>
+        {% endif %}
+
+        <section class="main">
+            <nav class="actions">
+                {# include "nav.inc.html" #}
+            </nav>
+
+            <article class="list">
+                <ul>
+                    {% for task in object_list %}
+                    <li class="task">
+                        {{ task.title }}
+                    </li>
+                    {% empty %}
+                    <li class="no-task"> There is not task to do! YaY! </li>
+                    {% endfor %}
+                </ul>
+            </article>
+        </section>
+
+        <!-- Loading JS at the end of the page -->
+        <script data-main="{{ STATIC_URL }}js/main" src="{{ STATIC_URL }}lib/js/require.js" charset="utf-8"></script>
+        {% block extrajs %}{% endblock %}
+    </body>
+</html>
