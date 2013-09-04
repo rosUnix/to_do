@@ -1,7 +1,7 @@
 require.config({
     baseUrl: '/static/js',
     paths: {
-        backbone: '../libs/js/backbone.min',
+        Backbone: '../libs/js/backbone.min',
         underscore: '../libs/js/underscore.min',
         jquery: '../libs/js/jquery-1.10.2.min',
         chosen: '../libs/js/chosen.jquery.min',
@@ -11,9 +11,9 @@ require.config({
         underscore: {
             exports: '_',
         },
-        backbone: {
+        Backbone: {
             deps: ['underscore', 'jquery'],
-            exports: 'backbone'
+            exports: 'Backbone'
         }
     }
 });

@@ -1,4 +1,4 @@
-define('app', ['backbone', 'underscore'], function (Backbone, _) {
+define('app', ['Backbone', 'underscore'], function (Backbone, _) {
 
 	return Backbone.View.extend({
 
