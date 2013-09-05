@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block main-container %}
+<article class="list">
+    <ul>
+        {% for task in object_list %}
+        <li class="task {{ task.status }}">
+            <p>{{ task.title }}</p>
+            <p>{{ task.description }}</p>
+            <p>{{ task.created_at }}</p>
+        </li>
+        {% empty %}
+        <li class="no-task"> There is not task to do! YaY! </li>
+        {% endfor %}
+    </ul>
+</article>
+{% endblock %}
