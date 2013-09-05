@@ -1,0 +1,15 @@
+<header>
+	<div class="title">
+		<h1>To-Do List!</h1>
+		<div class="desc">
+			An example to explain how great is <span class="highlighted">BackboneJS</span> :P
+		</div>
+	</div>
+	{% if has_messages %}
+        <div class="messages">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+        </div>
+    {% endif %}
+</header>

@@ -21,31 +21,17 @@
     <body {% block extra_body_class %}{% endblock %}>
         {% include "header.inc.html" %}
 
-        {% if has_messages %}
-        <section class="messages">
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-        </section>
-        {% endif %}
-
         <section class="main">
             <nav class="actions">
-                {# include "nav.inc.html" #}
+                {% include "nav.inc.html" %}
             </nav>
 
-            <article class="list">
-                <ul>
-                    {% for task in object_list %}
-                    <li class="task">
-                        {{ task.title }}
-                    </li>
-                    {% empty %}
-                    <li class="no-task"> There is not task to do! YaY! </li>
-                    {% endfor %}
-                </ul>
-            </article>
+            {% block main-container %}
+            
+            {% endblock %}
         </section>
+
+        {% include "footer.inc.html" %}
 
         <!-- Loading JS at the end of the page -->
         <script data-main="{{ STATIC_URL }}js/main" src="{{ STATIC_URL }}libs/js/require.min.js" charset="utf-8"></script>
