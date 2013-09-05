@@ -129,6 +129,13 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'task'
+)
+
+TASK_CHOICES = (
+    ('waiting', 'Waiting to pick up'),
+    ('in_progress', 'I am doing it, dude!'),
+    ('done', 'YaY! Done!'),
 )
 
 # A sample logging configuration. The only tangible logging
