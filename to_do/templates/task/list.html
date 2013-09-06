@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block main-container %}
-<article class="list">
-    <ul>
+<article>
+    <ul class="tasks-list">
         {% for task in object_list %}
         <li class="task {{ task.status }}">
             <p>{{ task.title }}</p>
