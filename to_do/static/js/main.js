@@ -23,3 +23,10 @@ require(['app'], function (app) {
         el: $('body')
     });
 });
+
+// require(['app']);
+// , function (TasksView) {
+//     return new TasksView({
+//         el: $('.tasks-list')
+//     });
+// });
