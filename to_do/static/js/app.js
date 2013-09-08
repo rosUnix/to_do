@@ -1,4 +1,4 @@
-define('app', ['Backbone', 'underscore', 'tasks_view'], function (Backbone, _, TasksView) {
+define('app', ['Backbone', 'underscore', 'tasks_view', 'nav_view'], function (Backbone, _, TasksView, NavView) {
 //define('app', ['Backbone', 'underscore', 'tasks_view'], function (Backbone, _) {
 
 	return Backbone.View.extend({
@@ -13,6 +13,12 @@ define('app', ['Backbone', 'underscore', 'tasks_view'], function (Backbone, _, T
 			tasks = new TasksView({
 				parent: this,
 				el: this.$el.find('.tasks-list'),
+				broker: this.broker
+			});
+
+			nav = new NavView({
+				parent: this,
+				el: this.$el.find('nav'),
 				broker: this.broker
 			});
 
