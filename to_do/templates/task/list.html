@@ -7,8 +7,6 @@
         <li class="task {{ task.status }}" task_id="{{ task.id }}">
             <p><input type="checkbox" name="task" value="{{ task.id }}" /></p>
             <p>{{ task.title }}</p>
-            <p>{{ task.description }}</p>
-            <p>{{ task.created_at }}</p>
         </li>
         {% empty %}
         <li class="no-task"> There is not task to do! YaY! </li>

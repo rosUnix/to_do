@@ -28,7 +28,6 @@ define('app', ['Backbone', 'underscore', 'tasks_view', 'nav_view'], function (Ba
 			// this.broker.on('task:edit:save', this.saveTasks, this);
 			// this.broker.on('task:status:change', this.changeStatusTasks, this);
 			// this.broker.on('task:remove', this.removeTasks, this);
-			// this.broker.on('task:search', this.searchTasks, this);
 			//
 			// this.broker.on('task:select', this.selectedItem, this);
 		}

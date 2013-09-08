@@ -3,8 +3,7 @@ from django.conf import settings
 
 
 class Task(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.CharField(max_length=500)
+    title = models.CharField(max_length=50, unique=True)
     created_at = models.DateField()
     status = models.CharField(max_length=30, choices=settings.TASK_CHOICES)
 

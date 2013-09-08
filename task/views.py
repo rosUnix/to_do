@@ -18,7 +18,6 @@ def get_task_list(request):
 
     taskList = [{'id': task.id,
                 'title': task.title,
-                'description': task.description,
                 'created_at': task.created_at.strftime("%D"),
                 'status': task.status} for task in Task.objects.all()]
 
@@ -34,7 +33,6 @@ def create_task(request):
 
         newTask = Task.objects.create(
             title=datas['title'],
-            description=datas['description'],
             status=datas['status'],
             created_at=datas['created_at'])
 

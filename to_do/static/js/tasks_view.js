@@ -21,9 +21,7 @@ define('tasks_view', ['app'], function (app) {
 			tagName: 'li',
 			template: '' +
 				'<p><input type="checkbox" name="task" value="<%= id %>" /></p>' +
-				'<p><%= title %></p>' +
-				'<p><%= description %></p>' +
-				'<p><%= created_at %></p>',
+				'<p><%= title %></p>',
 
 			initialize: function () {
 				_.bindAll(this, 'selectTask');
@@ -84,7 +82,6 @@ define('tasks_view', ['app'], function (app) {
 			this.broker.on('task:edit:save', this.saveTasks, this);
 			this.broker.on('task:status:change', this.changeStatusTasks, this);
 			this.broker.on('task:remove', this.removeTasks, this);
-			this.broker.on('task:search', this.searchTasks, this);
 		},
 
 		render: function () {
@@ -137,8 +134,7 @@ define('tasks_view', ['app'], function (app) {
 		editTasks: function (listTasks) {},
 		saveTasks: function (listTasks) {},
 		changeStatusTasks: function (listTasks) {},
-		removeTasks: function (listTasks) {},
-		searchTasks: function (query) {}
+		removeTasks: function (listTasks) {}
 	});
 
 });

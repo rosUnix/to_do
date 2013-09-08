@@ -11,18 +11,3 @@ urlpatterns = patterns('',
     url(r'^tasks/', get_task_list, name='get_task_list'),
     url(r'^admin/', include(admin.site.urls)),
 )
-
-
-"""
-MyModel = Backbone.Model.extend({
-
-url: function(){ "API/"
-      return "API/MyModel/" +this.get("id");
-    }
-});
-
-MyCollection = Backbone.Collection.extend({
-    model: MyModel ,
-    url: "API/MyModels"
-});
-"""

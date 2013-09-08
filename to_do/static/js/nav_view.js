@@ -20,21 +20,20 @@ define('nav_view', ['app'], function (app) {
 			}
 		}),
 
-		AddSearchNav = BaseNavView.extend({
+		AddTaskNav = BaseNavView.extend({
 
 			initialize: function (options) {
 				BaseNavView.prototype.initialize.call(this, options);
-				_.bindAll(this, 'addTask', 'searchTasks');
+				_.bindAll(this, 'addTask');
 
 				// Binding events fromt the user.
 				this.$el.find('.add a').bind('click', this.addTask);
-				this.$el.find('.search input').bind('keyup', this.searchTasks);
 
-				// Binding show/hide events for AddSearch navigation
-				this.broker.on('addSearch:show', function () {
+				// Binding show/hide events for AddTask navigation
+				this.broker.on('addTask:show', function () {
 					this.statusChange('toShow');
 				}, this);
-				this.broker.on('addSearch:hide', function () {
+				this.broker.on('addTask:hide', function () {
 					this.statusChange('toHide');
 				}, this);
 			},
@@ -42,16 +41,9 @@ define('nav_view', ['app'], function (app) {
 			addTask: function (e) {
 				e.preventDefault();
 
-				this.broker.trigger('addSearch:hide');
+				this.broker.trigger('addTask:hide');
 				this.broker.trigger('createForm:show');
 				// Display form nav (with title and description)
-			},
-
-			searchTasks: function (e) {
-				e.preventDefault();
-
-				// Triggering search event to tasks_view module.
-				this.broker.trigger('task:search', this.$el.find('.search input').val());
 			}
 		}),
 
@@ -78,7 +70,7 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				this.broker.trigger('createForm:hide');
-				this.broker.trigger('addSearch:show');
+				this.broker.trigger('addTask:show');
 
 				// Collect all datas to create a task.
 				var datas = this._collectDatas();
@@ -89,7 +81,7 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				this.broker.trigger('createForm:hide');
-				this.broker.trigger('addSearch:show');
+				this.broker.trigger('addTask:show');
 
 				this._cleanForm();
 			},
@@ -98,7 +90,6 @@ define('nav_view', ['app'], function (app) {
 				var datas = {};
 
 				datas.title = this.$el.find('[name=title]').val();
-				datas.description = this.$el.find('[name=desc]').val();
 				datas.status = 'waiting';
 
 				return datas;
@@ -184,7 +175,7 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				this.broker.trigger('saveCancel:hide');
-				this.broker.trigger('addSearch:show');
+				this.broker.trigger('addTask:show');
 
 				var selectedList = [];
 				if (this.action === 'editing') {
@@ -207,7 +198,7 @@ define('nav_view', ['app'], function (app) {
 				if (this.itemsSelected === 'checked') {
 					this.broker.trigger('editRemove:show');
 				} else {
-					this.broker.trigger('addSearch:show');
+					this.broker.trigger('addTask:show');
 				}
 			},
 
@@ -228,7 +219,7 @@ define('nav_view', ['app'], function (app) {
 
 			_.bindAll(this, 'selectedItem');
 
-			this.addSearch = new AddSearchNav({
+			this.addTask = new AddTaskNav({
 				parent: this,
 				el: this.$el.find('.default'),
 				broker: this.broker,
@@ -265,7 +256,7 @@ define('nav_view', ['app'], function (app) {
 
 		selectedItem: function (mode) {
 			if (mode === 'checked') {
-				this.broker.trigger('addSearch:hide');
+				this.broker.trigger('addTask:hide');
 				this.broker.trigger('createForm:hide');
 				this.broker.trigger('saveCancel:hide');
 
@@ -275,7 +266,7 @@ define('nav_view', ['app'], function (app) {
 				this.broker.trigger('createForm:hide');
 				this.broker.trigger('saveCancel:hide');
 
-				this.broker.trigger('addSearch:show');
+				this.broker.trigger('addTask:show');
 			}
 		}
 		
