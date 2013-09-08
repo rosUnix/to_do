@@ -7,6 +7,11 @@ define('tasks_view', ['app'], function (app) {
 			url: function () {
 				var id = this.get('id') ? this.get('id') : '';
 				return '/task/' + id;
+			},
+			initialize: function () {
+				this.bind('remove', function () {
+					this.destroy();
+				}, this);
 			}
 		}),
 
@@ -214,8 +219,25 @@ define('tasks_view', ['app'], function (app) {
 
 			this.editingFormEnable = false;
 		},
-		changeStatusTasks: function (listTasks) {},
-		removeTasks: function (listTasks) {}
+
+		removeTasks: function (listTasks) {
+			var self = this,
+				view;
+
+			_.each(this.tasksCollection.where({selected:true}), function (model) {
+				view = new TaskView({
+					el: self.$el.find('[task_id=' + model.get('id') + ']'),
+					model: model,
+					className: 'backbone task editing ' + model.get('status')
+				});
+
+				view.remove();
+			});
+
+			this.tasksCollection.remove(this.tasksCollection.where({selected:true}));
+		},
+
+		changeStatusTasks: function (listTasks) {}
 	});
 
 });
