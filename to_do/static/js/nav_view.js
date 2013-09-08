@@ -175,14 +175,15 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				this.broker.trigger('saveCancel:hide');
-				this.broker.trigger('addTask:show');
 
 				var selectedList = [];
 				if (this.action === 'editing') {
 					// Collect all datas: id, title and description.
+					this.broker.trigger('editRemove:show');
 					this.broker.trigger('task:edit:save', selectedList);
 				} else {
 					// collect a list of ID only
+					this.broker.trigger('addTask:show');
 					this.broker.trigger('task:remove', selectedList);
 				}
 			},
