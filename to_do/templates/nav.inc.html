@@ -8,6 +8,25 @@
 		</div>
 	</li>
 
+	<li class="form">
+		<form name="create_task" action="">
+			<div class="field">
+				<span><b>Title: </b></span>
+				<input type="text" name="title" />
+			</div>
+			<div class="field">
+				<span><b>Description: </b></span>
+				<input type="text" name="desc" />
+			</div>
+			<div class="button save">
+				<input type="submit" name="save_task" value="Save changes" />
+			</div>
+			<div class="button cancel">
+				<a href="#cancel">Cancel</a>
+			</div>
+		</form>
+	</li>
+
 	<li class="item_selected">
 		<div class="button edit">
 			<a href="#edit">Edit tasks</a>
@@ -23,9 +42,9 @@
 	<li class="action_required">
 		<div class="button save">
 			<input type="submit" name="save_task" value="Save changes" />
-		</li>
+		</div>
 		<div class="button cancel">
 			<a href="#cancel">Cancel</a>
-		</li>
+		</div>
 	</li>
 </ul>
