@@ -46,3 +46,11 @@ def task(request):
         task.save();
 
         return HttpResponse('{}', content_type="application/json");
+
+    if request.method == 'DELETE':
+        idTask = int(request.path.split('/')[2])
+        task = Task.objects.get(id=idTask)
+        task.delete()
+        
+        return HttpResponse('{}', content_type="application/json");
+
