@@ -126,10 +126,7 @@ define('nav_view', ['app'], function (app) {
 				this.broker.trigger('editRemove:hide');
 				this.broker.trigger('saveCancel:show', 'editing');
 
-				// Get a list of all tasks selected (ID).
-				var selectedTasks = [];
-				// Change mode from read-only to form in each task.
-				this.broker.trigger('tasks:edit:view', selectedTasks);
+				this.broker.trigger('tasks:edit:view');
 			},
 
 			removeTasks: function (e) {
@@ -180,11 +177,11 @@ define('nav_view', ['app'], function (app) {
 				if (this.action === 'editing') {
 					// Collect all datas: id, title and description.
 					this.broker.trigger('editRemove:show');
-					this.broker.trigger('task:edit:save', selectedList);
+					this.broker.trigger('tasks:edit:save', 'saving');
 				} else {
 					// collect a list of ID only
 					this.broker.trigger('addTask:show');
-					this.broker.trigger('task:remove', selectedList);
+					this.broker.trigger('tasks:remove', 'saving');
 				}
 			},
 
@@ -192,7 +189,11 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				// Come back each task to read-only mode
-				this.broker.trigger('task:edit:save', []);
+				if (this.action === 'editing') {
+					this.broker.trigger('tasks:edit:save', 'canceling');
+				} else {
+					this.broker.trigger('tasks:remove', 'canceling');
+				}
 
 				this.broker.trigger('saveCancel:hide');
 
