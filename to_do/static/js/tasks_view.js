@@ -20,7 +20,9 @@ define('tasks_view', ['app'], function (app) {
 		TaskView = Backbone.View.extend({
 			tagName: 'li',
 			template: '' +
-				'<p><input type="checkbox" name="task" value="<%= id %>" /></p>' +
+				'<p><input type="checkbox" ' +
+				'<% if (selected) { %> checked <% } %>' +
+				' name="task" value="<%= id %>" /></p>' +
 				'<p><%= title %></p>',
 			formTemplate: '' +
 				'<p><input type="checkbox" checked name="task" value="<%= id %>" /></p>' +
@@ -37,8 +39,9 @@ define('tasks_view', ['app'], function (app) {
 				} else {
 					this.$el.html(_.template(this.template, this.model.toJSON()));
 				}
-
 				this.$el.attr('task_id', this.model.get('id'));
+
+				this.$el.find('input:checkbox').unbind('click').bind('click', this.selectTask);
 				return this;
 			},
 
@@ -111,6 +114,7 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		selectItems: function (model) {
+			var self = this, view;
 			// If an item has been checked and it's the first one: trigger an event to enable editRemove mode.
 
 			if (model.get('selected') && this.tasksCollection.where({selected: true}).length === 1) {
@@ -122,10 +126,19 @@ define('tasks_view', ['app'], function (app) {
 
 			else if (!model.get('selected') && !this.tasksCollection.where({selected: true}).length) {
 				this.broker.trigger('task:select', 'unchecked');
+				if (this.editingFormEnable) {
+					view = new TaskView({
+						el: self.$el.find('[task_id=' + model.get('id') + ']'),
+						model: model,
+						className: 'backbone task editing ' + model.get('status')
+					});
+
+					view.render();
+				}
+				this.editingFormEnable = false;
 			}
 
 			if (this.editingFormEnable) {
-				var self = this, view;
 
 				// Anytime the user check or uncheck an item and the 'editingForm' view for a task is enable
 				// we need to: check/uncheck the item and re-render the view to form/read-only mode.
