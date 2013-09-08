@@ -5,7 +5,8 @@ define('tasks_view', ['app'], function (app) {
 				'selected': false
 			},
 			url: function () {
-				return '/task/' + this.get('id');
+				var id = this.get('id') ? this.get('id') : '';
+				return '/task/' + id;
 			}
 		}),
 
@@ -21,7 +22,7 @@ define('tasks_view', ['app'], function (app) {
 			template: '' +
 				'<p><input type="checkbox" name="task" value="<%= id %>" /></p>' +
 				'<p><%= title %></p>' +
-				'<p><%= desc %></p>' +
+				'<p><%= description %></p>' +
 				'<p><%= created_at %></p>',
 
 			initialize: function () {
@@ -119,9 +120,17 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		addTask: function (object) {
+			var self = this;
 			this.tasksCollection.create(object, {
 				wait: true,
-				success: this._syncModel(model, response)
+				success: function (model) {
+					var view = new TaskView({
+						model: model,
+						className: 'backbone tag ' + model.get('status')
+					});
+
+					self.$el.prepend(view.render().el);
+				}
 			});
 		},
 
