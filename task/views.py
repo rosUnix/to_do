@@ -25,7 +25,7 @@ def get_task_list(request):
 
 
 @csrf_exempt
-def create_task(request):
+def task(request):
 
     if request.method == 'POST':
         datas = json.loads(request.body)
@@ -37,3 +37,12 @@ def create_task(request):
             created_at=datas['created_at'])
 
         return HttpResponse(json.dumps({'id': newTask.id, 'created_at': newTask.created_at}), content_type="application/json");
+
+    if request.method == 'PUT':
+        data = json.loads(request.body);
+
+        task = Task.objects.get(id=data['id']);
+        task.title = data['title'];
+        task.save();
+
+        return HttpResponse('{}', content_type="application/json");
