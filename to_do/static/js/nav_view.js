@@ -39,13 +39,17 @@ define('nav_view', ['app'], function (app) {
 				}, this);
 			},
 
-			addTask: function () {
+			addTask: function (e) {
+				e.preventDefault();
+
 				this.broker.trigger('addSearch:hide');
 				this.broker.trigger('createForm:show');
 				// Display form nav (with title and description)
 			},
 
-			searchTasks: function () {
+			searchTasks: function (e) {
+				e.preventDefault();
+
 				// Triggering search event to tasks_view module.
 				this.broker.trigger('task:search', this.$el.find('.search input').val());
 			}
@@ -70,7 +74,9 @@ define('nav_view', ['app'], function (app) {
 				}, this);
 			},
 
-			submitTask: function () {
+			submitTask: function (e) {
+				e.preventDefault();
+
 				this.broker.trigger('createForm:hide');
 				this.broker.trigger('addSearch:show');
 
@@ -79,15 +85,28 @@ define('nav_view', ['app'], function (app) {
 				this.broker.trigger('task:create', datas);
 			},
 
-			cancelTask: function () {
+			cancelTask: function (e) {
+				e.preventDefault();
+
 				this.broker.trigger('createForm:hide');
 				this.broker.trigger('addSearch:show');
 
 				this._cleanForm();
 			},
 
-			_collectDatas: function () {},
-			_cleanForm: function() {}
+			_collectDatas: function () {
+				var datas = {};
+
+				datas.title = this.$el.find('[name=title]').val();
+				datas.description = this.$el.find('[name=desc]').val();
+				datas.status = 'waiting';
+
+				return datas;
+			},
+
+			_cleanForm: function() {
+				this.$el.find('[name=title], [name=desc]').val('');
+			}
 		}),
 
 		EditRemoveNav = BaseNavView.extend({
@@ -110,7 +129,9 @@ define('nav_view', ['app'], function (app) {
 				}, this);
 			},
 
-			editTasks: function () {
+			editTasks: function (e) {
+				e.preventDefault();
+
 				this.broker.trigger('editRemove:hide');
 				this.broker.trigger('saveCancel:show', 'editing');
 
@@ -120,7 +141,9 @@ define('nav_view', ['app'], function (app) {
 				this.broker.trigger('tasks:edit:view', selectedTasks);
 			},
 
-			removeTasks: function () {
+			removeTasks: function (e) {
+				e.preventDefault();
+
 				this.broker.trigger('editRemove:hide');
 				this.broker.trigger('saveCancel:show', 'removing');
 
@@ -129,7 +152,8 @@ define('nav_view', ['app'], function (app) {
 				// this.broker.trigger('tasks:remove', selectedTasks);
 			},
 
-			changeStatus: function () {
+			changeStatus: function (e) {
+				e.preventDefault();
 				// Show dropdow and apply the new status to all items selected
 			}
 		}),
@@ -156,7 +180,9 @@ define('nav_view', ['app'], function (app) {
 				this.broker.on('task:select', this._checkedItems);
 			},
 
-			saveTasks: function () {
+			saveTasks: function (e) {
+				e.preventDefault();
+
 				this.broker.trigger('saveCancel:hide');
 				this.broker.trigger('addSearch:show');
 
@@ -170,7 +196,9 @@ define('nav_view', ['app'], function (app) {
 				}
 			},
 
-			cancelTasks: function () {
+			cancelTasks: function (e) {
+				e.preventDefault();
+
 				// Come back each task to read-only mode
 				this.broker.trigger('task:edit:save', []);
 
