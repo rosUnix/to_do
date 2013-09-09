@@ -32,6 +32,26 @@
 		</div>
 	</li>
 
+	<li class="change_status">
+		<form name="change_status" action="">
+			<div class="field select">
+				<span><b>Status: </b></span>
+				<select>
+					<option value="">----------</option>
+					<option value="waiting">Waiting to pick up</option>
+					<option value="in_progress">I am doing it, dude!</option>
+					<option value="done">YaY! It's done!</option>
+				</select>
+			</div>
+			<div class="button save">
+				<input type="submit" name="save_task" value="Save changes" />
+			</div>
+			<div class="button cancel">
+				<a href="#cancel">Cancel</a>
+			</div>
+		</form>
+	</li>
+
 	<li class="action_required">
 		<div class="button save">
 			<input type="submit" name="save_task" value="Save changes" />
