@@ -136,16 +136,12 @@ define('nav_view', ['app'], function (app) {
 
 				this.broker.trigger('editRemove:hide');
 				this.broker.trigger('saveCancel:show', 'removing');
-
-				// Those tasks will be removed on the "save" action.
-				// var selectedTasks = [];
-				// this.broker.trigger('tasks:remove', selectedTasks);
 			},
 
 			changeStatus: function (e) {
 				e.preventDefault();
-				// Show dropdow and apply the new status to all items selected
 
+				// Show dropdow and apply the new status to all items selected
 				this.broker.trigger('editRemove:hide');
 				this.broker.trigger('selectStatus:show');
 			}
