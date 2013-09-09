@@ -320,18 +320,19 @@ define('nav_view', ['app'], function (app) {
 
 		selectedItem: function (mode) {
 			if (mode === 'checked') {
+
 				this.broker.trigger('addTask:hide');
 				this.broker.trigger('createForm:hide');
 				this.broker.trigger('selectStatus:hide');
 				this.broker.trigger('saveCancel:hide');
-
 				this.broker.trigger('editRemove:show');
+
 			} else if (mode === 'unchecked') {
+
 				this.broker.trigger('editRemove:hide');
 				this.broker.trigger('createForm:hide');
 				this.broker.trigger('selectStatus:hide');
 				this.broker.trigger('saveCancel:hide');
-
 				this.broker.trigger('addTask:show');
 			}
 		}
