@@ -1,4 +1,4 @@
-define('app', ['Backbone', 'underscore', 'tasks_view'], function (Backbone, _) {
+define('app', ['Backbone', 'underscore', 'tasks_view', 'nav_view'], function (Backbone, _, TasksView, NavView) {
 
 	return Backbone.View.extend({
 
