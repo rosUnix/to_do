@@ -41,9 +41,12 @@ define('tasks_view', ['app'], function (app) {
 			render: function (action) {
 				if (action === 'form') {
 					this.$el.html(_.template(this.formTemplate, this.model.toJSON()));
+				} else if (action === 'class') {
+					this.$el.attr('class', this.className);
 				} else {
 					this.$el.html(_.template(this.template, this.model.toJSON()));
 				}
+
 				this.$el.attr('task_id', this.model.get('id'));
 
 				this.$el.find('input:checkbox').unbind('click').bind('click', this.selectTask);
@@ -143,22 +146,20 @@ define('tasks_view', ['app'], function (app) {
 				this.editingFormEnable = false;
 			}
 
-			if (this.editingFormEnable) {
+			// Anytime the user check or uncheck an item and the 'editingForm' view for a task is enable
+			// we need to: check/uncheck the item and re-render the view to form/read-only mode.
 
-				// Anytime the user check or uncheck an item and the 'editingForm' view for a task is enable
-				// we need to: check/uncheck the item and re-render the view to form/read-only mode.
+			view = new TaskView({
+				el: self.$el.find('[task_id=' + model.get('id') + ']'),
+				model: model,
+				className: 'backbone task editing ' + model.get('new_status') || model.get('status')
+			});
 
-				view = new TaskView({
-					el: self.$el.find('[task_id=' + model.get('id') + ']'),
-					model: model,
-					className: 'backbone task editing ' + model.get('status')
-				});
-
-				if (model.get('selected')) {
-					view.render('form');
-				} else {
-					view.render();
-				}
+			if (this.editingFormEnable && model.get('selected')) {
+				view.render('form');
+			} else if (this.changingStatusEnable) {
+				view.model.set('new_status', this.parent.$el.find('.select select').val());
+				view.render();
 			}
 		},
 
@@ -205,39 +206,79 @@ define('tasks_view', ['app'], function (app) {
 				view = new TaskView({
 					el: self.$el.find('[task_id=' + model.get('id') + ']'),
 					model: model,
-					className: 'backbone task editing ' + model.get('status')
+					className: 'backbone task ' + model.get('status')
 				});
 
 				if (action === 'saving') {
-					// Save the model with the new title.
-					model.set('title', view.$el.find('[name=task_title_' + model.get('id') + ']').val());
+					if (view.$el.find('[name=task_title_' + model.get('id') + ']').val()) {
+						// Save the model with the new title.
+						model.set('title', view.$el.find('[name=task_title_' + model.get('id') + ']').val());
+					}
+
+					if (model.get('new_status')) {
+						model.set('status', model.get('new_status'));
+						view.render('class');
+					}
+
+					model.set('new_status', undefined);
+
 					model.save();
+				} else {
+					view.render('class');
 				}
 
 				view.render();
 			});
 
 			this.editingFormEnable = false;
+			this.changingFormEnable = false;
 		},
 
-		removeTasks: function (listTasks) {
+		removeTasks: function (action) {
+			var self = this,
+				view;
+
+			if (action === 'saving') {
+				_.each(this.tasksCollection.where({selected:true}), function (model) {
+					view = new TaskView({
+						el: self.$el.find('[task_id=' + model.get('id') + ']'),
+						model: model,
+						className: 'backbone task editing ' + model.get('status')
+					});
+
+					view.remove();
+				});
+
+				this.tasksCollection.remove(this.tasksCollection.where({selected:true}));
+			}
+
+			this.editingFormEnable = false;
+			this.changingFormEnable = false;
+		},
+
+		changeStatusTasks: function (newStatus) {
 			var self = this,
 				view;
 
 			_.each(this.tasksCollection.where({selected:true}), function (model) {
+				
+				if (!newStatus) {
+					model.set('new_status', undefined);
+				} else {
+					model.set('new_status', newStatus);
+				}
+
 				view = new TaskView({
 					el: self.$el.find('[task_id=' + model.get('id') + ']'),
 					model: model,
-					className: 'backbone task editing ' + model.get('status')
+					className: 'backbone task editing ' + (model.get('new_status') || model.get('status'))
 				});
 
-				view.remove();
+				view.render('class');
 			});
 
-			this.tasksCollection.remove(this.tasksCollection.where({selected:true}));
-		},
-
-		changeStatusTasks: function (listTasks) {}
+			this.changingStatusEnable = true;
+		}
 	});
 
 });

@@ -75,6 +75,8 @@ define('nav_view', ['app'], function (app) {
 				// Collect all datas to create a task.
 				var datas = this._collectDatas();
 				this.broker.trigger('task:create', datas);
+
+				this._cleanForm();
 			},
 
 			cancelTask: function (e) {
@@ -96,7 +98,7 @@ define('nav_view', ['app'], function (app) {
 			},
 
 			_cleanForm: function() {
-				this.$el.find('[name=title], [name=desc]').val('');
+				this.$el.find('[name=title]').val('');
 			}
 		}),
 
@@ -143,6 +145,63 @@ define('nav_view', ['app'], function (app) {
 			changeStatus: function (e) {
 				e.preventDefault();
 				// Show dropdow and apply the new status to all items selected
+
+				this.broker.trigger('editRemove:hide');
+				this.broker.trigger('selectStatus:show');
+			}
+		}),
+
+		SelectStatusNav = BaseNavView.extend({
+			initialize: function (options) {
+				BaseNavView.prototype.initialize.call(this, options);
+				_.bindAll(this, 'changingStatus', 'saveTasks', 'cancelTasks');
+
+				this.$el.find('.select select').bind('change', this.changingStatus);
+				this.$el.find('.save input').bind('click', this.saveTasks);
+				this.$el.find('.cancel a').bind('click', this.cancelTasks);
+
+				this.broker.on('selectStatus:show', function () {
+					this.statusChange('toShow');
+				}, this);
+				this.broker.on('selectStatus:hide', function () {
+					this.statusChange('toHide');
+				}, this);
+
+				this.broker.on('task:select', this._checkedItems);
+			},
+
+			changingStatus: function (e) {
+				e.preventDefault();
+
+				if (this.$el.find('.select select').val()) {
+					this.broker.trigger('tasks:status:change', this.$el.find('select').val());
+				} else {
+					this.broker.trigger('tasks:status:change', undefined);
+				}
+			},
+
+			saveTasks: function (e) {
+				e.preventDefault();
+
+				this.broker.trigger('selectStatus:hide');
+				this.broker.trigger('tasks:edit:save', 'saving');
+				this.broker.trigger('editRemove:show');
+
+				this._cleanForm();
+			},
+
+			cancelTasks: function (e) {
+				e.preventDefault();
+
+				this.broker.trigger('selectStatus:hide');
+				this.broker.trigger('tasks:edit:save', 'canceling');
+				this.broker.trigger('editRemove:show');
+
+				this._cleanForm();
+			},
+
+			_cleanForm: function () {
+				this.$el.find('.select select').val('');
 			}
 		}),
 
@@ -173,7 +232,6 @@ define('nav_view', ['app'], function (app) {
 
 				this.broker.trigger('saveCancel:hide');
 
-				var selectedList = [];
 				if (this.action === 'editing') {
 					// Collect all datas: id, title and description.
 					this.broker.trigger('editRemove:show');
@@ -242,6 +300,13 @@ define('nav_view', ['app'], function (app) {
 				status: this.statusNavList[1]
 			});
 
+			this.selectStatus = new SelectStatusNav({
+				parent: this,
+				el: this.$el.find('.change_status'),
+				broker: this.broker,
+				status: this.statusNavList[1]
+			});
+
 			this.saveCancel = new SaveCancelNav({
 				parent: this,
 				el: this.$el.find('.action_required'),
@@ -251,6 +316,7 @@ define('nav_view', ['app'], function (app) {
 
 			this.createForm.$el.hide();
 			this.editRemove.$el.hide();
+			this.selectStatus.$el.hide();
 			this.saveCancel.$el.hide();
 
 			this.broker.on('task:select', this.selectedItem);
@@ -260,12 +326,14 @@ define('nav_view', ['app'], function (app) {
 			if (mode === 'checked') {
 				this.broker.trigger('addTask:hide');
 				this.broker.trigger('createForm:hide');
+				this.broker.trigger('selectStatus:hide');
 				this.broker.trigger('saveCancel:hide');
 
 				this.broker.trigger('editRemove:show');
 			} else if (mode === 'unchecked') {
 				this.broker.trigger('editRemove:hide');
 				this.broker.trigger('createForm:hide');
+				this.broker.trigger('selectStatus:hide');
 				this.broker.trigger('saveCancel:hide');
 
 				this.broker.trigger('addTask:show');
