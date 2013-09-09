@@ -41,9 +41,13 @@ define('tasks_view', ['app'], function (app) {
 			render: function (action) {
 				if (action === 'form') {
 					this.$el.html(_.template(this.formTemplate, this.model.toJSON()));
+
 				} else if (action === 'class') {
+					this.className = this.model.get('new_status') || this.model.get('status');
 					this.$el.attr('class', this.className);
-				} else {
+				}
+
+				if (action !== 'form') {
 					this.$el.html(_.template(this.template, this.model.toJSON()));
 				}
 
@@ -54,6 +58,10 @@ define('tasks_view', ['app'], function (app) {
 			},
 
 			selectTask: function (e) {
+				e.preventDefault();
+
+				// Update selected attribute of a model. That will trigger 'change:selected' event
+				// which was binded with 'selectItems' function on the main view.
 				this.model.set('selected', !this.model.get('selected'));
 			}
 		});
@@ -67,8 +75,10 @@ define('tasks_view', ['app'], function (app) {
 			this.parent = options.parent;
 			this.broker = options.broker;
 
-			_.bindAll(this, 'selectItems');
+			_.bindAll(this, 'selectItems', '_tasksFetched');
 
+			// Define a collection where will be stored a view for each task.
+			this._viewsCollection = new Backbone.Collection();
 			// Define a collection where will be stored the list of tasks.
 			this.tasksCollection = new TasksCollection();
 
@@ -76,25 +86,15 @@ define('tasks_view', ['app'], function (app) {
 			// to store all task in the collection as models.
 			this.tasksCollection.fetch({
 				success: function () {
-					if (self.$el.children().length !== self.tasksCollection.length &&
-						!self.$el.find('.no-task').length) {
-						self.render();
-					} else {
-						self.tasksCollection.each(function (model) {
-							// Binding events. Need to create the views.
-							var view = new TaskView({
-								el: self.$el.find('[task_id=' + model.get('id') + ']'),
-								model: model,
-								className: 'backbone tag ' + model.get('status')
-							});
-						}, this);
-					}
+					self._tasksFetched();
 				}
 			});
 
+			// Binding events trigger by the user.
 			this.tasksCollection.bind('change:selected', this.selectItems);
 
-			// Binding events!
+			// Binding public events to our general Backbone.Event object.
+			// Those will be triggered by nav_view.
 			this.broker.on('task:create', this.addTask, this);
 			this.broker.on('tasks:edit:view', this.editTasks, this);
 			this.broker.on('tasks:edit:save', this.saveTasks, this);
@@ -102,13 +102,44 @@ define('tasks_view', ['app'], function (app) {
 			this.broker.on('tasks:remove', this.removeTasks, this);
 		},
 
+		_tasksFetched: function () {
+
+			// If there's no tasks in the database we need to display any message
+			// telling it. If it gets some tasks we need to create and store a view for each one.
+			if (this.$el.children().length !== this.tasksCollection.length &&
+				!this.$el.find('.no-task').length) {
+				this.render();
+
+			} else {
+				this.tasksCollection.each(function (model) {
+					// Binding events. Need to create the views.
+					this._viewsCollection.add({
+						'id': model.get('id'),
+						'view': this._getTaskView(model)
+					});
+				}, this);
+			}
+		},
+
 		render: function () {
+			var self = this;
+
+			// Rendering the entire list of tasks
+			// Or a message if there's no tasks.
+
 			this.$el.children().remove();
+			this._viewsCollection.reset([]);
+
 			this.tasksCollection.each(function (model) {
-				
+
 				var view = new TaskView({
 					model: model,
 					className: 'backbone tag ' + model.get('status')
+				});
+
+				self._viewsCollection.add({
+					'id': model.get('id'),
+					'view': view
 				});
 
 				this.$el.append(view.render().el);
@@ -122,56 +153,57 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		selectItems: function (model) {
-			var self = this, view;
-			// If an item has been checked and it's the first one: trigger an event to enable editRemove mode.
+			var self = this, view = this._viewsCollection.findWhere({'id': model.get('id')}).get('view');
+
+			// If an item has been checked and it's the first one: trigger an event to enable editRemove bar mode.
+			// Else, if an item has been unchecked and it was the last element checked: trigger an event to disable
+			// editRemove mode and enable addTask instead.
 
 			if (model.get('selected') && this.tasksCollection.where({selected: true}).length === 1) {
 				this.broker.trigger('task:select', 'checked');
-			}
-
-			// Else, if an item has been unchecked and it was the last element checked: trigger an event to disable
-			// editRemove mode.
-
-			else if (!model.get('selected') && !this.tasksCollection.where({selected: true}).length) {
+			} else if (!model.get('selected') && !this.tasksCollection.where({selected: true}).length) {
 				this.broker.trigger('task:select', 'unchecked');
-				if (this.editingFormEnable) {
-					view = new TaskView({
-						el: self.$el.find('[task_id=' + model.get('id') + ']'),
-						model: model,
-						className: 'backbone task editing ' + model.get('status')
-					});
 
-					view.render();
-				}
 				this.editingFormEnable = false;
+				this.changingStatusEnable = false;
 			}
 
-			// Anytime the user check or uncheck an item and the 'editingForm' view for a task is enable
-			// we need to: check/uncheck the item and re-render the view to form/read-only mode.
-
-			view = new TaskView({
-				el: self.$el.find('[task_id=' + model.get('id') + ']'),
-				model: model,
-				className: 'backbone task editing ' + model.get('new_status') || model.get('status')
-			});
+			// Anytime the user check or uncheck an item and the 'editingForm' view or 'changeStatus' is enable
+			// we need to: check/uncheck the item and re-render the view to form/read-only mode and/or restore
+			// the original status of the task.
 
 			if (this.editingFormEnable && model.get('selected')) {
 				view.render('form');
-			} else if (this.changingStatusEnable) {
+			} else if (this.changingStatusEnable && model.get('selected')) {
 				view.model.set('new_status', this.parent.$el.find('.select select').val());
+				view.render('class');
+			} else if (this.changingStatusEnable && !model.get('selected')) {
+				view.model.set('new_status', undefined);
+				view.render('class');
+			} else {
 				view.render();
 			}
 		},
 
 		addTask: function (object) {
-			var self = this;
+			var self = this, view;
+
 			this.tasksCollection.create(object, {
 				wait: true,
 				success: function (model) {
-					var view = new TaskView({
+					view = new TaskView({
 						model: model,
-						className: 'backbone tag ' + model.get('status')
+						className: model.get('status')
 					});
+
+					self._viewsCollection.add({
+						'id': model.get('id'),
+						'view': view
+					});
+
+					if (self.$el.find('.no-task').length) {
+						self.$el.children().remove();
+					}
 
 					self.$el.prepend(view.render().el);
 				}
@@ -186,12 +218,7 @@ define('tasks_view', ['app'], function (app) {
 				// Create a view with them.
 				// re-render with a form: remove what is inside <li> and replace it for a form (only title)
 
-				view = new TaskView({
-					el: self.$el.find('[task_id=' + model.get('id') + ']'),
-					model: model,
-					className: 'backbone task editing ' + model.get('status')
-				});
-
+				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
 				view.render('form');
 			});
 
@@ -200,30 +227,25 @@ define('tasks_view', ['app'], function (app) {
 
 		saveTasks: function (action) {
 			var self = this,
-				view;
+				view, title;
 
 			_.each(this.tasksCollection.where({selected:true}), function (model) {
-				view = new TaskView({
-					el: self.$el.find('[task_id=' + model.get('id') + ']'),
-					model: model,
-					className: 'backbone task ' + model.get('status')
-				});
+				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
 
 				if (action === 'saving') {
-					if (view.$el.find('[name=task_title_' + model.get('id') + ']').val()) {
-						// Save the model with the new title.
-						model.set('title', view.$el.find('[name=task_title_' + model.get('id') + ']').val());
-					}
+					title = view.$el.find('[name=task_title_' + model.get('id') + ']').val();
+					if (title) view.model.set('title', title);
 
-					if (model.get('new_status')) {
-						model.set('status', model.get('new_status'));
+					if (view.model.get('new_status')) {
+						view.model.set('status', view.model.get('new_status'));
 						view.render('class');
+						view.model.set('new_status', undefined);
 					}
+					view.model.save();
 
-					model.set('new_status', undefined);
-
-					model.save();
 				} else {
+					// When cancel, need to set the original status on the view.
+					view.model.set('new_status', undefined);
 					view.render('class');
 				}
 
@@ -240,16 +262,15 @@ define('tasks_view', ['app'], function (app) {
 
 			if (action === 'saving') {
 				_.each(this.tasksCollection.where({selected:true}), function (model) {
-					view = new TaskView({
-						el: self.$el.find('[task_id=' + model.get('id') + ']'),
-						model: model,
-						className: 'backbone task editing ' + model.get('status')
-					});
-
+					view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
 					view.remove();
 				});
 
 				this.tasksCollection.remove(this.tasksCollection.where({selected:true}));
+
+				if (!this.tasksCollection.length) {
+					this.render();
+				}
 			}
 
 			this.editingFormEnable = false;
@@ -261,23 +282,26 @@ define('tasks_view', ['app'], function (app) {
 				view;
 
 			_.each(this.tasksCollection.where({selected:true}), function (model) {
-				
-				if (!newStatus) {
-					model.set('new_status', undefined);
-				} else {
-					model.set('new_status', newStatus);
-				}
+				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
 
-				view = new TaskView({
-					el: self.$el.find('[task_id=' + model.get('id') + ']'),
-					model: model,
-					className: 'backbone task editing ' + (model.get('new_status') || model.get('status'))
-				});
+				if (!newStatus) {
+					view.model.set('new_status', undefined);
+				} else {
+					view.model.set('new_status', newStatus);
+				}
 
 				view.render('class');
 			});
 
 			this.changingStatusEnable = true;
+		},
+
+		_getTaskView: function (model) {
+			return new TaskView({
+				el: this.$el.find('[task_id=' + model.get('id') + ']'),
+				model: model,
+				className: (model.get('new_status') || model.get('status'))
+			});
 		}
 	});
 
