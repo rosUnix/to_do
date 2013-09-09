@@ -18,7 +18,6 @@ def get_task_list(request):
 
     taskList = [{'id': task.id,
                 'title': task.title,
-                'created_at': task.created_at.strftime("%D"),
                 'status': task.status} for task in Task.objects.all()]
 
     return HttpResponse(json.dumps(taskList), content_type="application/json")
@@ -29,28 +28,26 @@ def task(request):
 
     if request.method == 'POST':
         datas = json.loads(request.body)
-        datas['created_at'] = datetime.datetime.now().strftime("%Y-%m-%d")
 
         newTask = Task.objects.create(
             title=datas['title'],
-            status=datas['status'],
-            created_at=datas['created_at'])
+            status=datas['status'])
 
-        return HttpResponse(json.dumps({'id': newTask.id, 'created_at': newTask.created_at}), content_type="application/json");
+        return HttpResponse(json.dumps({'id': newTask.id}), content_type="application/json")
 
     if request.method == 'PUT':
-        data = json.loads(request.body);
+        data = json.loads(request.body)
 
-        task = Task.objects.get(id=data['id']);
-        task.title = data['title'];
-        task.save();
+        task = Task.objects.get(id=data['id'])
+        task.title = data['title']
+        task.status = data['status']
+        task.save()
 
-        return HttpResponse('{}', content_type="application/json");
+        return HttpResponse('{}', content_type="application/json")
 
     if request.method == 'DELETE':
         idTask = int(request.path.split('/')[2])
         task = Task.objects.get(id=idTask)
         task.delete()
-        
-        return HttpResponse('{}', content_type="application/json");
 
+        return HttpResponse('{}', content_type="application/json")
