@@ -79,6 +79,7 @@ define('tasks_view', ['app'], function (app) {
 
 			// Define a collection where will be stored a view for each task.
 			this._viewsCollection = new Backbone.Collection();
+
 			// Define a collection where will be stored the list of tasks.
 			this.tasksCollection = new TasksCollection();
 
@@ -106,6 +107,7 @@ define('tasks_view', ['app'], function (app) {
 
 			// If there's no tasks in the database we need to display any message
 			// telling it. If it gets some tasks we need to create and store a view for each one.
+
 			if (this.$el.children().length !== this.tasksCollection.length &&
 				!this.$el.find('.no-task').length) {
 				this.render();
@@ -188,6 +190,10 @@ define('tasks_view', ['app'], function (app) {
 		addTask: function (object) {
 			var self = this, view;
 
+			// To create a task it needs all the datas (get them in object)
+			// and syncronized _viewsCollection with the new view created.
+			// Also, append the task to the list generated rendering the view.
+
 			this.tasksCollection.create(object, {
 				wait: true,
 				success: function (model) {
@@ -213,11 +219,10 @@ define('tasks_view', ['app'], function (app) {
 		editTasks: function () {
 			var self = this, view;
 
-			_.each(this.tasksCollection.where({selected:true}), function (model) {
-				
-				// Create a view with them.
-				// re-render with a form: remove what is inside <li> and replace it for a form (only title)
+			// Event triggered by nav_view. For each task selected in the list it needs to
+			// re-render in 'edit' mode. Also need to know that 'EditMode' is enable.
 
+			_.each(this.tasksCollection.where({selected:true}), function (model) {
 				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
 				view.render('form');
 			});
@@ -226,8 +231,14 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		saveTasks: function (action) {
-			var self = this,
-				view, title;
+			var self = this, view, title;
+
+			// Event triggered by nav_view. For each task selected in the list it needs to
+			// collect the new datas, they could be 'title' or 'status' and save them in the
+			// model of this task. After that, need to render the view to update HTML.
+			// Otherwise, if the event is to CANCEL the action, we need to set up 'title'
+			// and 'status' to the default value of the task and render it.
+			// Also, saving any action means that any 'editMode' has been disabled.
 
 			_.each(this.tasksCollection.where({selected:true}), function (model) {
 				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
@@ -257,13 +268,20 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		removeTasks: function (action) {
-			var self = this,
-				view;
+			var self = this, view;
+
+			// Event triggered by nav_view. For each task selected it needs to remove the DOM
+			// from the list of tasks and also, need to remove the view/model from all collections.
+			// If the main collection (tasksCollection) is empty it needs to render a message telling
+			// that there's no tasks on the list.
+			// Also, after removing tasks or canceling the current action it needs to disable any
+			// 'editMode' in the main view.
 
 			if (action === 'saving') {
 				_.each(this.tasksCollection.where({selected:true}), function (model) {
 					view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
 					view.remove();
+					self._viewsCollection.remove(self._viewsCollection.findWhere({'id': model.get('id')}));
 				});
 
 				this.tasksCollection.remove(this.tasksCollection.where({selected:true}));
@@ -278,8 +296,14 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		changeStatusTasks: function (newStatus) {
-			var self = this,
-				view;
+			var self = this, view;
+
+			// Event triggered by nav_view. For each task selected it needs to re-render
+			// the view appling the new status selected. That doesn't means to save the new
+			// status for each tasks (that will be done on saveTasks function)
+			// If there's no status in the task it will set up the current one.
+			// Also, there's a 'editMode' enable because it's enable the form to change status
+			// of some tasks.
 
 			_.each(this.tasksCollection.where({selected:true}), function (model) {
 				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
@@ -297,6 +321,9 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		_getTaskView: function (model) {
+
+			// Create and return a new task with the model provided.
+
 			return new TaskView({
 				el: this.$el.find('[task_id=' + model.get('id') + ']'),
 				model: model,
