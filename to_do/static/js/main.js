@@ -14,6 +14,9 @@ require.config({
         Backbone: {
             deps: ['underscore', 'jquery'],
             exports: 'Backbone'
+        },
+        uniform: {
+            deps: ['jquery']
         }
     }
 });
