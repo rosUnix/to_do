@@ -3,9 +3,7 @@ require.config({
     paths: {
         Backbone: '../libs/js/backbone.min',
         underscore: '../libs/js/underscore.min',
-        jquery: '../libs/js/jquery-1.10.2.min',
-        chosen: '../libs/js/chosen.jquery.min',
-        uniform: '../libs/js/jquery.uniform.min'
+        jquery: '../libs/js/jquery-1.10.2.min'
     },
     shim: {
         underscore: {
@@ -14,9 +12,6 @@ require.config({
         Backbone: {
             deps: ['underscore', 'jquery'],
             exports: 'Backbone'
-        },
-        uniform: {
-            deps: ['jquery']
         }
     }
 });

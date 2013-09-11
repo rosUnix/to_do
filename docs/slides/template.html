@@ -34,11 +34,9 @@ URL: https://code.google.com/p/io-2012-slides
 
 <slides class="layout-widescreen">
 
-  <slide class="">
-    <article class="flexbox vcenter">
-      <span><img src="images/logo.png"></span>
-    </article>
-  </slide>
+
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
 
   <slide class="title-slide segue">
     <aside class="gdbar"><img src="images/small-icon-copycentral.png"></aside>
@@ -50,63 +48,897 @@ URL: https://code.google.com/p/io-2012-slides
     </hgroup>
   </slide>
 
+  <!-- Slide 01 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
   <slide>
     <hgroup>
       <h2>BackboneJS</h2>
-      <h3>Defining views</h3>
+      <h3>What's that?</h3>
+    </hgroup>
+    <article class="smaller">
+      <p>BackboneJS is a <b>javascript framework</b> based on the <i>Model-View-Presenter</i> <b>(MVP)</b> application design paradigm.</p>
+      <p>What does BackboneJS provide?</p>
+      <ul>
+        <li><b>Backbone.Model</b>: Manage datas</li>
+        <li><b>Backbone.Collection</b>: Set of models</li>
+        <li><b>Backbone.View</b>: Organize the interface</li>
+        <li><b>Backbone.Events</b>: Extra module to customize events</li>
+        <li><b>Backbone.Route</b>: Define relations URL - view</li>
+      </ul>
+      <p>Examples</p>
+      <ul>
+        <li><b>Copycentral</b></li>
+        <li><b>To-Do List!</b></li>
+      </ul>
+    </article>
+  </slide>
+
+  <!-- Slide 02 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>To-Do List!</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <img src="images/to-do_list_screenshot.png" alt="Description" title="Description">
+      <footer class="source">http://to-do.rosadurante.com</footer>
+    </article>
+  </slide>
+
+  <!-- Slide 03 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>To-Do List!</h2>
+    </hgroup>
+    <article class="smaller">
+      <p>To-Do List is a single-page web application where you can create/edit/remove tasks.</p>
+      <p>It has been made just as a example of this workshop, using <b>Django</b> on backend side and <b>BackboneJS</b> to build the frontend site. Others requirements are: Postgres, UnderscoreJS, requireJS and jQuery.</p>
+
+      <p>The data model of this example is not hard at all!</p>
+      <ul>
+        <li><b>TaskModel</b>: It is a Backbone.Model that store all datas related with one task.</li>
+        <li><b>TasksCollection</b>: It is a Backbone.Collection that is used as a set of all tasks in the list.</li>
+        <li><b>TaskView</b>: It is a Backbone.View that manage the DOM of just one task.</li>
+        <li><b>TasksView</b>: It is a Backbone.View that handle the basic funcitonality we can do with a task: Add / Edit / Remove / Restore.</li>
+        <li><b>BaseNavView</b>: It is a Backbone.View that handle all customs events that could be triggered for each different navigation bars. Based on this view, it defines: <b>AddTaskNav</b>, <b>CreateFormNav</b>, <b>EditRemoveNav</b>, <b>SelectStatusNav</b> and <b>SaveCancelNav</b>.</li>
+        <li><b>NavView</b>: It is a Backbone.View that handle five different navigation bars.</li>
+        <li><b>Broker</b>: It is a Backbone.Events object to bind customs events on it.</li>
+      </ul>
+    </article>
+  </slide>
+
+  <!-- Slide 04 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Models</h3>
     </hgroup>
     <article class="smaller">
       <pre class="prettyprint" data-lang="javascript">
-        var new_view = new CustomView({
-         <b>el: $('#view'),
-            parent: this,
-            datas: $('#view').datas()</b>
-        });
+        var default_model = new Backbone.Model();
 
-        var CustomView = Backbone.View.extend({
-            initialize: function (<b>options</b>) {
-             <b>options.el;
-                options.parent;
-                options.datas;</b>
-            }
-        });
+            default_model_with_datas = new Backbone.Model({
+                first_attr: True,
+                second_attr: 10
+            });
+
+        default_model_with_datas.get('first_attr');    // True
+        default_model_with_datas.set('first_attr', False);
+        default_model_with_datas.has('second_attr');   // True
+        default_model_with_datas.toJSON()   // {'first_attr': False, 'second_attr': 10 }
+
+        // If Model has define a url: 
+        default_model_with_datas.fetch();   // GET request. Get datas from database by id.
+        default_model_with_datas.save();    // POST/PUT request. Create/Update an object in database.
+        default_model_with_datas.destroy(); // DELETE request. Remove the object in database.
       </pre>
-      <!-- <pre class="prettyprint" data-lang="javascript">
-        
-      </pre>
-      <pre class="prettyprint" data-lang="javascript">
-        initialize: function (options) {
-         <b>options.el;
-            options.parent;
-            options.datas;</b>
-        }
-      </pre> -->
     </article>
   </slide>
-<!-- 
-  // Say hello world until the user starts questioning
-  // the meaningfulness of their existence.
-  function helloWorld(world) {
-    <b>for (var i = 42; --i &gt;= 0;) {
-      alert('Hello ' + String(world));
-    }</b>
-  }
-&lt;/script&gt;
-</pre> -->
 
-
-
-  <!-- CREATING VIEWS -->
-<!--             <b>tagName: 'ul',
-            template: '&lt;li class="item"&gt;' +
-              '&lt;p&gt; &lt;%= title %&gt; &lt;/p&gt;' +
-              '&lt;li class="item"&gt;', </b>
- -->
-
-    </article>
-  </slide>
+  <!-- Slide 05 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
 
   <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Models: <b>TaskModel</b></h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="javascript">
+        var <b>TaskModel</b> = Backbone.Model.extend({
+              defaults: {
+                'selected': false,
+                'status': 'waiting'
+              },
+              url: function () {
+                var id = this.has('id') ? this.get('id') : '';
+                return '/task/' + id;
+              },
+              initialize: function () {
+                this.bind('remove', function () {
+                  this.destroy();
+                }, this);
+              }
+            });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 06 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Models: <b>TaskModel</b></h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="javascript">
+        var task = new TaskModel({
+              'title': 'Slides for the workshop'
+            });
+
+        task.save();  // Creating new object in db. Getting id after that.
+        // POST /task/  request.body: {'title': 'Slides for the workshop', 'status': 'waiting'}. 
+        // Getting back id=1
+
+        task.fetch(); // response: {'id': 1, 'title': 'Slides for the workshop', 'status': 'waiting'}
+        // GET /task/1
+
+        task.set('title', task.get('title') + ' edited!');
+        task.save();  // Updating the object with the new title.
+        // PUT /task/1  request.body: {'id': 1, 'title': 'Slides for the workshop edited!', 'status':
+        // 'waiting'}
+
+        task.destroy(); // Removing the object from db.
+        // DELETE /task/1
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 07 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Collections</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="javascript">
+        var default_collection = new Backbone.Collection([
+              { 'first_attr': false, 'second_attr': 3 },
+              { 'first_attr': true, 'second_attr': 0 },
+              { 'first_attr': true, 'second_attr': 7 }
+            ]);
+
+        collection.add([{'first_attr': false, 'second_attr': 1}]);  // Adding new model
+        collection.length;  // There are 4 models in the collection.
+        
+        collection.findWhere({'second_attr', 0}); // Gets first model with 'second_attr' to 0.
+        collection.where({'first_attr', false});  // Gets a list of models with 'first_attr' to false.
+        
+        collection.remove(colleciton.findWhere({'second_attr', 7}));  // Removes a model.
+
+        collection.each(function (model) {}); // Iter for each model in the collection.
+
+        collection.toJSON(); // Return a list of attributes for each model in the collection as JSON.
+        
+        collection.reset([]); // Reset the collection with the datas provided. This case will became empty.
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 08 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Collections: <b>TasksCollection</b></h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="javascript">
+        var TasksCollection = Backbone.Collection.extend({
+              model: <b>TaskModel</b>, // We can provide a custom model to use in this collection.
+              url: function () {
+                return 'tasks/';
+              }
+            }),
+
+            tasks_collection = new TasksCollection();
+
+        tasks_collection.fetch({
+          // GET /tasks/
+          success: function (response) { /* Do something when the collection has been updated. */ }
+        });
+
+        tasks_collection.create({'title': 'Slides for the workshop'},
+          // POST /task/ {object}
+          success: function (model) { /* Do something when the new model has been created in database. */ }
+        });
+
+        tasks_collection.where({selected:true}); // Gets a list of all selected tasks
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 09 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Collections: <b>TasksCollection</b></h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="javascript">
+        // Events in a collection.
+
+        tasks_collection.bind('change:selected', function (model) {
+          // Anytime when a TaskModel in this collection changes 'selected' attribute this 
+          // function will be triggered. <b>model</b> is the task who changed his attribute.
+
+          if (model.get('selected') && tasks_collection.where({selected:true}).length === 1) {
+            // For this case, if the condition is true, <b>model</b> has been the first task to be selected
+            // in the list of tasks.
+
+          } else if (!model.get('selected') && !tasks_collection.wherer({selected:false}).length) {
+            // For this other case, if the condition is true, <b>model</b> has been the last task
+            // selected in the list and it becames unselect.
+          }
+        });
+
+        task_model = tasks_collection.get(1);  // Gets the TaskModel with id=1
+        task_model.set('selected', true);  // This action will call the previous function.
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 10 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        &lt;body&gt;
+          &lt;div <b>id="#view"</b>&gt; &lt;a href="#link1"&gt;Link 1&lt;/a&gt; &lt;a href="#link2"&gt;Link 2&lt;/a&gt; &lt;/div&gt;
+        &lt;/body&gt;
+      </pre>
+      <pre class="prettyprint" data-lang="javascript">
+        var default_view = new Backbone.View({el: $('#view')});
+
+        default_view.el; // &lt;div id="#view"&gt;&lt;a href="#link1"&gt;Link 1&lt;/a&gt;&lt;a href="#link2"&gt;Link 2&lt;/a&gt;&lt;/div&gt;
+
+        default_view.remove(); // Removes the DOM attached and unbind all events binded before.
+        default_view.el;  // &lt;div id="#view"&gt;&lt;a href="#link1"&gt;Link 1&lt;/a&gt;&lt;a href="#link2"&gt;Link 2&lt;/a&gt;&lt;/div&gt;
+
+        // <b>.el</b> still exists! What <b>.remove()</b> does is removing that piece of code from HTML but not
+        // from the Backbone.View object.
+      </pre>
+      <pre class="prettyprint" data-lang="html">
+        &lt;body&gt; &lt;/body&gt;
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 11 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        &lt;div <b>id="#view"</b>&gt; &lt;a href="#link1"&gt;Link 1&lt;/a&gt; &lt;a href="#link2"&gt;Link 2&lt;/a&gt; &lt;/div&gt;
+      </pre>
+      <pre class="prettyprint" data-lang="javascript">
+        var CustomView = Backbone.View.extend({
+              template: '&lt;p&gt;View rendered!&lt;/p&gt;',
+              render: function () {
+                this.$el.html(this.template);
+                return this;
+              }
+            }),
+
+            custom_view = new CustomView({el: $('#view')});
+
+        custom_view.el; // &lt;div id="#view"&gt; &lt;a href="#link1"&gt;Link 1&lt;/a&gt; &lt;a href="#link2"&gt;Link 2&lt;/a&gt; &lt;/div&gt;
+        custom_view.render().el // &lt;div id="#view"&gt; &lt;p&gt;View rendered!&lt;/p&gt; &lt;/div&gt;
+      </pre>
+      <pre class="prettyprint" data-lang="html">
+        &lt;div id="#view"&gt; &lt;p&gt;View rendered!&lt;/p&gt; &lt;/div&gt;
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 12 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Requeriment: <b>UnderscoreJS</b></h3>
+    </hgroup>
+    <article class="smaller">
+      <p><b>UnderscoreJS</b> is the only hard dependency that BackboneJS has. It provides a set of methods on Collections (such as <b>.each()</b>) and it brings much more of them to use in views. Really useful.</p>
+      <p>Some of them are:</p>
+      <ul>
+        <li><b>_.each(list, iterator)</b>: Iterates over a list of elements. Function gets '(element, index, list)' as arguments. If 'list' is actually a Javascript Object, arguments will be '(key, value, list)'</li>
+        
+        <li><b>_filter(list, iterator)</b>: Looks throught each value in the list and return an array withh all the values that pass a truth test (iterator).</li>
+        
+        <li><b>_.bindAll(object, *methodNames)</b>: Binds a number of methods on the object, specified by methodNames, to be run in the context of that object whenever they are invoked.</li>
+
+        <li><b>_.extend(object, *sources)</b>: Copy all of the properties in the source objects over to the destination object, and return the destination object.</li>
+
+        <li><b>_.template(templateString, [datas])</b>: Compiles JavaScript templates into functions that can be evaluated for rendering using JSON data source.</li>
+      </ul>
+    </article>
+  </slide>
+
+  <!-- Slide 13 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TaskView</b></h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="javascript">
+        var TaskView = Backbone.View.extend({
+              template: '&lt;p&gt; &lt;input type="checkbox" &lt;% if (selected) { %&gt; checked &lt;% } %&gt;' +
+                        ' name="task" value="&lt;%= id %&gt;" /&gt; &lt;/p&gt; &lt;p&gt; &lt;%= title %&lt; &lt;/p&gt;',
+              
+              events: { 'click :checkbox': 'selectTask' },
+
+              initialize: function () {
+                _.bindAll(this, 'selectedTask');
+              },
+              
+              render: function () {
+                this.$el.html(_.template(this.template, this.model.toJSON()));
+                return this;
+              },
+              
+              selectTask: function (e) {
+                this.model.set('selected', !this.model.get('selected'));
+              }
+
+            });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 14 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TaskView</b></h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        &lt;li class="task" task_id="1"&gt;
+          &lt;p&gt; &lt;input type="checkbox" name="task" value="1" /&gt; &lt;/p&gt;
+          &lt;p&gt; Slides for the workshop &lt;/p&gt;
+        &lt;/li&gt;
+      </pre>
+      <pre class="prettyprint" data-lang="javascript">
+        var task_view,
+            task_model = new TaskModel({
+              'title': 'Slides for the workshop'
+            });
+
+        task_model.save(); // Saving the model to get the id back in the response.
+
+        task_view = new TaskView({
+          el: $('[task_id=' + task_model.get('id') + ']'),
+          model: task_model,
+          className: task_model.get('status')
+        });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 15 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (1)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        var TasksView = Backbone.View.extend({
+              noTaskTemplate: '&lt;li class="no-task"&gt;There is no task to do! YaY!&lt;/li&gt;',
+
+              <b>initialize</b>: function (options) { ... },
+
+              render: function () { ... },
+              selectItems: function (model) { ... },
+
+              // Our events behaviour
+              addTask: function (object) { ... },
+              editTasks: function () { ... },
+              saveTasks: function (action) { ... },
+              removeTasks: function (action) { ... },
+              changeStatusTasks: function (newStatus) { ... }
+
+              // "private" functions
+              _tasksFetched: function () { ... },
+              _getTaskView: function (model) { ... },
+            });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 16 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (2)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        initialize: function (options) {
+          
+          var self = this;
+          this.parent = options.parent;  // A reference to the view who create TasksView
+
+          _.bindAll(this, 'selectItems', '_tasksFetched');
+
+          this._viewsCollection = new Backbone.Collection();  // Collection of TaskViews
+          this.tasksCollection = new <b>TasksCollection</b>();  // Collection of TaskModel
+
+          this.tasksCollection.fetch({
+            success: function () {
+              self._tasksFetched();
+            }
+          });
+
+          this.tasksCollection.bind('change:selected', this.selectItems);
+
+          // ...
+        },
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 17 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (3)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        initialize: function (options) {
+          
+          // ...
+          
+          // Defining functions for every event that could be triggered.
+
+          this.broker = options.broker // It is a Backbone.Event object.
+
+          this.broker.on('task:create', this.addTask, this);
+          
+          this.broker.on('tasks:edit:view', this.editTasks, this);
+          
+          this.broker.on('tasks:edit:save', this.saveTasks, this);
+          
+          this.broker.on('tasks:status:change', this.changeStatusTasks, this);
+          
+            this.broker.on('tasks:remove', this.removeTasks, this);
+        },
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 18 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (4)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        var TasksView = Backbone.View.extend({
+              noTaskTemplate: '&lt;li class="no-task"&gt;There is no task to do! YaY!&lt;/li&gt;',
+
+              initialize: function (options) { ... },
+
+              render: function () { ... },
+              <b>selectItems</b>: function (model) { ... },
+
+              // Our events behaviour
+              addTask: function (object) { ... },
+              editTasks: function () { ... },
+              saveTasks: function (action) { ... },
+              removeTasks: function (action) { ... },
+              changeStatusTasks: function (newStatus) { ... }
+
+              // "private" functions
+              _tasksFetched: function () { ... },
+              _getTaskView: function (model) { ... },
+            });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 19 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (5)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        selectItems: function (model) {
+
+          // This will toggle between bars. When there is no task selected the only action the user
+          // has is 'create a task'. If one or more tasks are selected, the actions are 'edit tasks',
+          // 'remove tasks' and 'change status'.
+
+          if (model.get('selected') && tasks_collection.where({selected:true}).length === 1) {
+            // <b>model</b> has been the first task to be selected in the list of tasks.
+
+            <b>this.broker.trigger</b>('task:select', 'checked');
+
+          } else if (!model.get('selected') && !tasks_collection.wherer({selected:false}).length) {
+            // <b>model</b> has been the last task selected in the list and it becames unselect.
+
+            <b>this.broker.trigger</b>('task:select', 'unchecked');
+          }
+        },
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 20 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (6)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        var TasksView = Backbone.View.extend({
+              noTaskTemplate: '&lt;li class="no-task"&gt;There is no task to do! YaY!&lt;/li&gt;',
+
+              initialize: function (options) { ... },
+
+              render: function () { ... },
+              selectItems: function (model) { ... },
+
+              // Our events behaviour
+              <b>addTask</b>: function (object) { ... },
+              editTasks: function () { ... },
+              saveTasks: function (action) { ... },
+              removeTasks: function (action) { ... },
+              changeStatusTasks: function (newStatus) { ... }
+
+              // "private" functions
+              _tasksFetched: function () { ... },
+              _getTaskView: function (model) { ... },
+            });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 21 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (7)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        addTask: function (object) {
+          var self = this, view;
+          // This function does not get any model yet. What it has is an Javascript object as JSON
+          // with all the datas needed to create a new task. 
+          this.tasksCollection.create(object, {
+            success: function (model) {
+              // Creating new TaskView with the model just created.
+              view = new <b>TaskView</b>({
+                model: model,
+                className: model.get('status')
+              });
+              // Add the view into the private collection.
+              self._viewCollection.add({'id': model.get('id'), 'view': view});
+
+              // If there was no task before, remove the 'non-task' item from the list.
+              if (self.$el.find('.no-task').length) { self.$el.children().remove(); }
+              self.$el.prepend(view.render().el);
+            }
+          });
+        },
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 22 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (8)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        var TasksView = Backbone.View.extend({
+              noTaskTemplate: '&lt;li class="no-task"&gt;There is no task to do! YaY!&lt;/li&gt;',
+
+              initialize: function (options) { ... },
+
+              render: function () { ... },
+              selectItems: function (model) { ... },
+
+              // Our events behaviour
+              addTask: function (object) { ... },
+              <b>editTasks</b>: function () { ... },
+              saveTasks: function (action) { ... },
+              removeTasks: function (action) { ... },
+              changeStatusTasks: function (newStatus) { ... }
+
+              // "private" functions
+              _tasksFetched: function () { ... },
+              _getTaskView: function (model) { ... },
+            });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 23 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (9)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        editTasks: function () {
+          var self = this, view;
+
+          // When this function has been called, every selected task should be rendered as 'editMode'.
+          // It means, it will be render using <b>input:text</b> rather than <b>label</b> on title to be edited.
+
+          _.each(this.tasksCollection.where({selected:true}), function (model) {
+
+            // It needs to get the view related with the model that is selected (<b>model</b>).
+            view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
+
+            // It needs to be render as form view. For that, <b>TaskView.render()</b> has been modified.
+            view.render('form');
+          
+          });
+
+          this.editingFormEnable = true;
+        },
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 24 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (9)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        var TasksView = Backbone.View.extend({
+              noTaskTemplate: '&lt;li class="no-task"&gt;There is no task to do! YaY!&lt;/li&gt;',
+
+              initialize: function (options) { ... },
+
+              render: function () { ... },
+              selectItems: function (model) { ... },
+
+              // Our events behaviour
+              addTask: function (object) { ... },
+              editTasks: function () { ... },
+              <b>saveTasks</b>: function (action) { ... },
+              removeTasks: function (action) { ... },
+              changeStatusTasks: function (newStatus) { ... }
+
+              // "private" functions
+              _tasksFetched: function () { ... },
+              _getTaskView: function (model) { ... },
+            });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 25 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (10)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        saveTasks: function (action) {
+          var self = this, view, title;
+          _.each(this.tasksCollection.where({selected:true}), function (model) {
+            view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
+            
+            // This function could be called by saving a new title or changing status.
+            if (action === 'saving') {
+              title = view.$el.find('[name=task_title_' + model.get('id') + ']').val();
+              if (title) view.model.set('title', title);
+              else if (view.model.get('new_status')) { 
+                view.model.set('status', view.model.get('new_status')); }
+              view.model.save();
+            }
+
+            view.render(); // Re-render taskView updating the DOM for each task.
+          });
+
+          this.editingFormEnable = false;
+        },
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 26 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (11)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        var TasksView = Backbone.View.extend({
+              noTaskTemplate: '&lt;li class="no-task"&gt;There is no task to do! YaY!&lt;/li&gt;',
+
+              initialize: function (options) { ... },
+
+              render: function () { ... },
+              selectItems: function (model) { ... },
+
+              // Our events behaviour
+              addTask: function (object) { ... },
+              editTasks: function () { ... },
+              saveTasks: function (action) { ... },
+              <b>removeTasks</b>: function (action) { ... },
+              changeStatusTasks: function (newStatus) { ... }
+
+              // "private" functions
+              _tasksFetched: function () { ... },
+              _getTaskView: function (model) { ... },
+            });
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 27 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <slide>
+    <hgroup>
+      <h2>BackboneJS</h2>
+      <h3>Views: <b>TasksView</b> (12)</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+        removeTasks: function (action) {
+          var self = this, view;
+
+          if (action === 'saving') {
+            _.each(this.tasksCollection.where({selected:true}), function (model) {
+              view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
+              view.remove();
+              self._viewsCollection.remove(self._viewsCollection.findWhere({'id': model.get('id')}));
+            });
+
+            this.tasksCollection.remove(this.tasksCollection.where({selected:true}));
+
+            // If the user remove all task in the list it needs to render the 'no-task' item.
+            if (!this.tasksCollection.length) {
+              this.render();
+            }
+          }
+
+          this.editingFormEnable = false;
+        },
+      </pre>
+    </article>
+  </slide>
+
+  <!-- Slide 28 -->
+  <!-- =========================================================================================== -->
+  <!-- =========================================================================================== -->
+
+  <!-- <slide>
+    <hgroup>
+      <h2></h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="javascript">
+      </pre>
+    </article>
+  </slide> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!-- <slide>
     <hgroup>
       <h2>Code Slide (with Subtitle Placeholder)</h2>
       <h3>Subtitle Placeholder</h3>
@@ -458,10 +1290,10 @@ function helloWorld(world) {
     <article>
       <iframe data-src="http://www.google.com/doodle4google/resources/history.html"></iframe>
     </article>
-  </slide>
+  </slide> -->
 
-  <slide class="thank-you-slide segue nobackground">
-    <aside class="gdbar right"><img src="images/google_developers_icon_128.png"></aside>
+  <slide class="thank-you-slide segue">
+    <aside class="gdbar right"><img src="images/small-icon-copycentral.png"></aside>
     <article class="flexbox vleft auto-fadein">
       <h2>&lt;Thank You!&gt;</h2>
       <p>Important contact information goes here.</p>

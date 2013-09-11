@@ -310,6 +310,7 @@ slides > slide:not(.nobackground):before {
   height: 40px;
   width: 180px;
   line-height: 1.9;
+  opacity: 0.6;
 }
 /* line 147, ../scss/default.scss */
 slides > slide:not(.nobackground):after {
@@ -1234,7 +1235,7 @@ article.smaller q:before, article.smaller q:after {
 
 /* line 826, ../scss/default.scss */
 .thank-you-slide {
-  background: #4387fd !important;
+  background: #333333 !important;
   color: white;
 }
 /* line 830, ../scss/default.scss */

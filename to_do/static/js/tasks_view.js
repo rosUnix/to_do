@@ -5,7 +5,7 @@ define('tasks_view', ['app'], function (app) {
 				'selected': false
 			},
 			url: function () {
-				var id = this.get('id') ? this.get('id') : '';
+				var id = this.has('id') ? this.get('id') : '';
 				return '/task/' + id;
 			},
 			initialize: function () {
@@ -33,9 +33,10 @@ define('tasks_view', ['app'], function (app) {
 				'<p><input type="checkbox" checked name="task" value="<%= id %>" /></p>' +
 				'<p><input type="text" name="task_title_<%= id %>" value="<%= title %>" /></p>',
 
+			events: { 'click :checkbox': 'selectTask' },
+
 			initialize: function () {
 				_.bindAll(this, 'selectTask');
-				this.$el.find('input').bind('click', this.selectTask);
 			},
 
 			render: function (action) {
@@ -52,8 +53,6 @@ define('tasks_view', ['app'], function (app) {
 				}
 
 				this.$el.attr('task_id', this.model.get('id'));
-
-				this.$el.find('input:checkbox').unbind('click').bind('click', this.selectTask);
 				return this;
 			},
 
@@ -323,7 +322,6 @@ define('tasks_view', ['app'], function (app) {
 		_getTaskView: function (model) {
 
 			// Create and return a new task with the model provided.
-
 			return new TaskView({
 				el: this.$el.find('[task_id=' + model.get('id') + ']'),
 				model: model,
