@@ -6,18 +6,20 @@ define('nav_view', ['app'], function (app) {
 				this.broker = options.broker;
 				this.parent = options.parent;
 				this.status = options.status;
+
 			},
 
-			statusChange: function (status) {
-				// ['showing', 'hiding', 'toShow', 'toHide']
-				if (status === 'toShow') {
+			_bindNavEvents: function (label) {
+				this.broker.on(label + ':show', function (action) {
 					this.$el.show();
 					this.status = 'showing';
-				} else if (status === 'toHide') {
+					if (action) this.action = action;
+				}, this);
+				this.broker.on(label + ':hide', function () {
 					this.$el.hide();
 					this.status = 'hiding';
-				}
-			}
+				}, this);
+			},
 		}),
 
 		AddTaskNav = BaseNavView.extend({
@@ -30,12 +32,7 @@ define('nav_view', ['app'], function (app) {
 				this.$el.find('.add a').bind('click', this.addTask);
 
 				// Binding show/hide events for AddTask navigation
-				this.broker.on('addTask:show', function () {
-					this.statusChange('toShow');
-				}, this);
-				this.broker.on('addTask:hide', function () {
-					this.statusChange('toHide');
-				}, this);
+				this._bindNavEvents('addTask');
 			},
 
 			addTask: function (e) {
@@ -58,12 +55,7 @@ define('nav_view', ['app'], function (app) {
 				this.$el.find('.cancel a').bind('click', this.cancelTask);
 
 				// Binding show/hide events for CreateForm navigation
-				this.broker.on('createForm:show', function () {
-					this.statusChange('toShow');
-				}, this);
-				this.broker.on('createForm:hide', function () {
-					this.statusChange('toHide');
-				}, this);
+				this._bindNavEvents('createForm');
 			},
 
 			submitTask: function (e) {
@@ -114,12 +106,7 @@ define('nav_view', ['app'], function (app) {
 				this.$el.find('.status a').bind('click', this.changeStatus);
 
 				// Binding show/hide events for EditRemove navigation
-				this.broker.on('editRemove:show', function () {
-					this.statusChange('toShow');
-				}, this);
-				this.broker.on('editRemove:hide', function () {
-					this.statusChange('toHide');
-				}, this);
+				this._bindNavEvents('editRemove');
 			},
 
 			editTasks: function (e) {
@@ -156,12 +143,7 @@ define('nav_view', ['app'], function (app) {
 				this.$el.find('.save input').bind('click', this.saveTasks);
 				this.$el.find('.cancel a').bind('click', this.cancelTasks);
 
-				this.broker.on('selectStatus:show', function () {
-					this.statusChange('toShow');
-				}, this);
-				this.broker.on('selectStatus:hide', function () {
-					this.statusChange('toHide');
-				}, this);
+				this._bindNavEvents('selectStatus');
 
 				this.broker.on('task:select', this._checkedItems);
 			},
@@ -212,16 +194,20 @@ define('nav_view', ['app'], function (app) {
 				this.$el.find('.cancel a').bind('click', this.cancelTasks);
 
 				// Binding show/hide events for SaveCancel navigation
-				this.broker.on('saveCancel:show', function (action) {
-					this.statusChange('toShow');
-					this.action = action;
-				}, this);
-				this.broker.on('saveCancel:hide', function () {
-					this.statusChange('toHide');
-				}, this);
+				this._bindNavEvents('saveCancel');
 
 				this.broker.on('task:select', this._checkedItems);
 			},
+
+			// _bindNavEvents: function () {
+			//	this.broker.on('saveCancel:show', function (action) {
+			//		this._statusChange('toShow');
+			//		this.action = action;
+			//	}, this);
+			//	this.broker.on('saveCancel:hide', function () {
+			//		this._statusChange('toHide');
+			//	}, this);
+			// },
 
 			saveTasks: function (e) {
 				e.preventDefault();
