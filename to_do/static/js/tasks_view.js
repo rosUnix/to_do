@@ -174,14 +174,14 @@ define('tasks_view', ['app'], function (app) {
 
 			if (this.editingFormEnable && model.get('selected')) {
 				view.render('form');
-			} else if (this.changingStatusEnable && model.get('selected')) {
-				view.model.set('new_status', this.parent.$el.find('.select select').val());
-			} else if (this.changingStatusEnable && !model.get('selected')) {
-				view.model.set('new_status', undefined);
-				if (!this.tasksCollection.where({selected:true}).length)  this.changingStatusEnable = false;
-				view.render('class');
 			} else {
-				view.render();
+				if (this.changingStatusEnable && model.get('selected')) {
+					view.model.set('new_status', this.parent.$el.find('.select select').val());
+				} else if (this.changingStatusEnable && !model.get('selected')) {
+					view.model.set('new_status', undefined);
+					if (!this.tasksCollection.where({selected:true}).length)  this.changingStatusEnable = false;
+				}
+				view.render('class');
 			}
 		},
 
