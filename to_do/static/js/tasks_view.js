@@ -166,7 +166,6 @@ define('tasks_view', ['app'], function (app) {
 				this.broker.trigger('task:select', 'unchecked');
 
 				this.editingFormEnable = false;
-				this.changingStatusEnable = false;
 			}
 
 			// Anytime the user check or uncheck an item and the 'editingForm' view or 'changeStatus' is enable
@@ -177,9 +176,9 @@ define('tasks_view', ['app'], function (app) {
 				view.render('form');
 			} else if (this.changingStatusEnable && model.get('selected')) {
 				view.model.set('new_status', this.parent.$el.find('.select select').val());
-				view.render('class');
 			} else if (this.changingStatusEnable && !model.get('selected')) {
 				view.model.set('new_status', undefined);
+				if (!this.tasksCollection.where({selected:true}).length)  this.changingStatusEnable = false;
 				view.render('class');
 			} else {
 				view.render();
