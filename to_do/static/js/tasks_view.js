@@ -210,6 +210,10 @@ define('tasks_view', ['app'], function (app) {
 					}
 
 					self.$el.prepend(view.render().el);
+					self.broker.trigger('success:task:create');
+				},
+				error: function () {
+					self.broker.trigger('error:tasks', 'created');
 				}
 			});
 		},
@@ -252,6 +256,8 @@ define('tasks_view', ['app'], function (app) {
 					}
 					view.model.save();
 
+					self.broker.trigger('success:tasks:save', 'updated');
+
 				} else {
 					// When cancel, need to set the original status on the view.
 					view.model.set('new_status', undefined);
@@ -287,6 +293,8 @@ define('tasks_view', ['app'], function (app) {
 				if (!this.tasksCollection.length) {
 					this.render();
 				}
+
+				this.broker.trigger('success:tasks:save', 'removed');
 			}
 
 			this.editingFormEnable = false;
