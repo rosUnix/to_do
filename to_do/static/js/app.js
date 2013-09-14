@@ -11,19 +11,19 @@ define('app', ['Backbone', 'underscore', 'tasks_view', 'nav_view', 'msg_view'], 
 
 			tasks = new TasksView({
 				parent: this,
-				el: this.$el.find('.tasks-list'),
+				el: this.$('.tasks-list'),
 				broker: this.broker
 			});
 
 			nav = new NavView({
 				parent: this,
-				el: this.$el.find('nav'),
+				el: this.$('nav'),
 				broker: this.broker
 			});
 
 			msg = new MsgView({
 				parent: this,
-				el: this.$el.find('.messages'),
+				el: this.$('.messages'),
 				broker: this.broker
 			});
 		}
