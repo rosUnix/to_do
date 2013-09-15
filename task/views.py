@@ -1,53 +1,58 @@
 # Create your views here.
-import datetime
 import json
 
 from django.http import HttpResponse
-from django.views.generic.list import ListView
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import View
+from django.views.generic.list import ListView
 
 from task.models import Task
 
 
+class CSRFExemptMixin(object):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
+
+
 class TaskList(ListView):
     model = Task
-    template_name = 'task/list.html'
 
 
-def get_task_list(request):
+class TaskListAPI(View):
+    def get(self, request, *args, **kwargs):
+        taskList = [{'id': task.id,
+                    'title': task.title,
+                    'status': task.status} for task in Task.objects.all()]
 
-    taskList = [{'id': task.id,
-                'title': task.title,
-                'status': task.status} for task in Task.objects.all()]
-
-    return HttpResponse(json.dumps(taskList), content_type="application/json")
+        return HttpResponse(json.dumps(taskList), content_type="application/json")
 
 
-@csrf_exempt
-def task(request):
+class TaskAPI(CSRFExemptMixin, View):
 
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         datas = json.loads(request.body)
 
         newTask = Task.objects.create(
             title=datas['title'],
             status=datas['status'])
 
-        return HttpResponse(json.dumps({'id': newTask.id}), content_type="application/json")
+        return HttpResponse(json.dumps({'id': newTask.id}), content_type="application/json")    
 
-    if request.method == 'PUT':
+    def put(self, request, *args, **kwargs):
         data = json.loads(request.body)
 
-        task = Task.objects.get(id=data['id'])
+        task = Task.objects.get(pk=kwargs['id'])
         task.title = data['title']
         task.status = data['status']
         task.save()
 
         return HttpResponse('{}', content_type="application/json")
 
-    if request.method == 'DELETE':
-        idTask = int(request.path.split('/')[2])
-        task = Task.objects.get(id=idTask)
+    def delete(self, request, *args, **kwargs):
+        task = Task.objects.get(pk=kwargs['id'])
         task.delete()
 
         return HttpResponse('{}', content_type="application/json")
