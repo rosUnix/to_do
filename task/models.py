@@ -1,5 +1,3 @@
-import datetime
-
 from django.db import models
 from django.conf import settings
 
@@ -12,5 +10,5 @@ class Task(models.Model):
     class Meta:
         ordering = ('-created_at',)
 
-    def __unicode__(self):  # pragma: no cover
+    def __unicode__(self):
         return self.title
