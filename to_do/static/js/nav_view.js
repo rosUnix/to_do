@@ -162,8 +162,8 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				this.broker.trigger('selectStatus:hide');
-				this.broker.trigger('tasks:edit:save', 'saving');
-				this.broker.trigger('editRemove:show');
+				this.broker.trigger('tasks:edit:save', this.$('select').val() || undefined);
+				this.broker.trigger('addTask:show');
 
 				this._cleanForm();
 			},
@@ -172,7 +172,7 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				this.broker.trigger('selectStatus:hide');
-				this.broker.trigger('tasks:edit:save', 'canceling');
+				this.broker.trigger('tasks:cancel');
 				this.broker.trigger('editRemove:show');
 
 				this._cleanForm();
@@ -213,15 +213,12 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				this.broker.trigger('saveCancel:hide');
+				this.broker.trigger('addTask:show');
 
 				if (this.action === 'editing') {
-					// Collect all datas: id, title and description.
-					this.broker.trigger('editRemove:show');
-					this.broker.trigger('tasks:edit:save', 'saving');
+					this.broker.trigger('tasks:edit:save');
 				} else {
-					// collect a list of ID only
-					this.broker.trigger('addTask:show');
-					this.broker.trigger('tasks:remove', 'saving');
+					this.broker.trigger('tasks:remove');
 				}
 			},
 
@@ -229,11 +226,7 @@ define('nav_view', ['app'], function (app) {
 				e.preventDefault();
 
 				// Come back each task to read-only mode
-				if (this.action === 'editing') {
-					this.broker.trigger('tasks:edit:save', 'canceling');
-				} else {
-					this.broker.trigger('tasks:remove', 'canceling');
-				}
+				this.broker.trigger('tasks:cancel');
 
 				this.broker.trigger('saveCancel:hide');
 

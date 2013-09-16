@@ -12,6 +12,14 @@ define('tasks_view', ['app'], function (app) {
 				this.bind('remove', function () {
 					this.destroy();
 				}, this);
+
+				this.bind('change:title', function () {
+					this.save();
+				}, this);
+
+				this.bind('change:status', function () {
+					this.save();
+				}, this);
 			}
 		}),
 
@@ -39,20 +47,18 @@ define('tasks_view', ['app'], function (app) {
 				_.bindAll(this, 'selectTask');
 			},
 
-			render: function (action) {
-				if (action === 'form') {
+			render: function (status) {
+				if (status.editMode && this.model.get('selected')) {
 					this.$el.html(_.template(this.formTemplate, this.model.toJSON()));
-
-				} else if (action === 'class') {
-					this.className = this.model.get('new_status') || this.model.get('status');
-					this.$el.attr('class', this.className);
-				}
-
-				if (action !== 'form') {
+				} else {
 					this.$el.html(_.template(this.template, this.model.toJSON()));
+
+					if (status.statusMode) {
+						this.$el.attr('class', (status.statusSelected || this.model.get('status')));
+					}
 				}
 
-				this.$el.attr('task_id', this.model.get('id'));
+				// this.$el.attr('task_id', this.model.get('id'));
 				return this;
 			},
 
@@ -100,6 +106,8 @@ define('tasks_view', ['app'], function (app) {
 			this.broker.on('tasks:edit:save', this.saveTasks, this);
 			this.broker.on('tasks:status:change', this.changeStatusTasks, this);
 			this.broker.on('tasks:remove', this.removeTasks, this);
+
+			this.broker.on('tasks:cancel', this.cancelAction, this);
 		},
 
 		_tasksFetched: function () {
@@ -116,10 +124,31 @@ define('tasks_view', ['app'], function (app) {
 					// Binding events. Need to create the views.
 					this._viewsCollection.add({
 						'id': model.get('id'),
-						'view': this._getTaskView(model)
+						'view': this._getOrCreateTaskView(model)
 					});
 				}, this);
 			}
+		},
+
+		_selectedTasks: function () {
+			return this.tasksCollection.where({selected:true});
+		},
+
+		_areTasksSelected: function () {
+			return Boolean(this._selectedTasks().length);
+		},
+
+		_getOrCreateTaskView: function (model) {
+
+			if (this._viewsCollection.findWhere({'id': model.get('id')}))
+				return this._viewsCollection.findWhere({'id': model.get('id')}).get('view');
+			// Create and return a new task with the model provided.
+			return new TaskView({
+				el: this.$el.find('[task_id=' + model.get('id') + ']'),
+				model: model,
+				// TO-DO: check if we still need new_status
+				className: model.get('status')
+			});
 		},
 
 		render: function () {
@@ -143,7 +172,11 @@ define('tasks_view', ['app'], function (app) {
 					'view': view
 				});
 
-				this.$el.append(view.render().el);
+				// T0-DO: Changing render
+				this.$el.append(view.render({
+					'editMode': self._editingFormEnable,
+					'statusMode': self._changingStatusEnable
+				}).el);
 			}, this);
 
 			if (!this.tasksCollection.length) {
@@ -154,7 +187,7 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		selectItems: function (model) {
-			var self = this, view = this._viewsCollection.findWhere({'id': model.get('id')}).get('view');
+			var self = this, view = this._getOrCreateTaskView(model);
 
 			// If an item has been checked and it's the first one: trigger an event to enable editRemove bar mode.
 			// Else, if an item has been unchecked and it was the last element checked: trigger an event to disable
@@ -162,27 +195,21 @@ define('tasks_view', ['app'], function (app) {
 
 			if (model.get('selected') && this.tasksCollection.where({selected: true}).length === 1) {
 				this.broker.trigger('task:select', 'checked');
-			} else if (!model.get('selected') && !this.tasksCollection.where({selected: true}).length) {
+			} else if (!model.get('selected') && !this._areTasksSelected()) {
 				this.broker.trigger('task:select', 'unchecked');
 
-				this.editingFormEnable = false;
+				this._editingFormEnable = false;
 			}
 
 			// Anytime the user check or uncheck an item and the 'editingForm' view or 'changeStatus' is enable
 			// we need to: check/uncheck the item and re-render the view to form/read-only mode and/or restore
 			// the original status of the task.
 
-			if (this.editingFormEnable && model.get('selected')) {
-				view.render('form');
-			} else {
-				if (this.changingStatusEnable && model.get('selected')) {
-					view.model.set('new_status', this.parent.$el.find('.select select').val());
-				} else if (this.changingStatusEnable && !model.get('selected')) {
-					view.model.set('new_status', undefined);
-					if (!this.tasksCollection.where({selected:true}).length)  this.changingStatusEnable = false;
-				}
-				view.render('class');
-			}
+			view.render({
+				'editMode': this._editingFormEnable,
+				'statusMode': this._changingStatusEnable,
+				'statusSelected': this.parent.$('.select select').val()
+			});
 		},
 
 		addTask: function (object) {
@@ -208,8 +235,12 @@ define('tasks_view', ['app'], function (app) {
 					if (self.$el.find('.no-task').length) {
 						self.$el.children().remove();
 					}
+					// T0-DO: Changing render
+					self.$el.prepend(view.render({
+						'editMode': self._editingFormEnable,
+						'statusMode': self._changingStatusEnable
+					}).el);
 
-					self.$el.prepend(view.render().el);
 					self.broker.trigger('success:task:create');
 				},
 				error: function () {
@@ -219,21 +250,24 @@ define('tasks_view', ['app'], function (app) {
 		},
 
 		editTasks: function () {
-			var self = this, view;
+			var self = this;
 
 			// Event triggered by nav_view. For each task selected in the list it needs to
 			// re-render in 'edit' mode. Also need to know that 'EditMode' is enable.
 
-			_.each(this.tasksCollection.where({selected:true}), function (model) {
-				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
-				view.render('form');
+			this._editingFormEnable = true;
+			this._changingStatusEnable = false;
+
+			_.each(this._selectedTasks(), function (model) {
+				self._getOrCreateTaskView(model).render({
+					'editMode': self._editingFormEnable,
+				});
 			});
 
-			this.editingFormEnable = true;
 		},
 
-		saveTasks: function (action) {
-			var self = this, view, title;
+		saveTasks: function (newStatus) {
+			var self = this, view, title, changed = false;
 
 			// Event triggered by nav_view. For each task selected in the list it needs to
 			// collect the new datas, they could be 'title' or 'status' and save them in the
@@ -242,33 +276,32 @@ define('tasks_view', ['app'], function (app) {
 			// and 'status' to the default value of the task and render it.
 			// Also, saving any action means that any 'editMode' has been disabled.
 
-			_.each(this.tasksCollection.where({selected:true}), function (model) {
-				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
+			this._editingFormEnable = false;
+			this._changingStatusEnable = false;
 
-				if (action === 'saving') {
-					title = view.$el.find('[name=task_title_' + model.get('id') + ']').val();
-					if (title) view.model.set('title', title);
+			_.each(this._selectedTasks(), function (model) {
+				view = self._getOrCreateTaskView(model);
 
-					if (view.model.get('new_status')) {
-						view.model.set('status', view.model.get('new_status'));
-						view.render('class');
-						view.model.set('new_status', undefined);
-					}
-					view.model.save();
-
-					self.broker.trigger('success:tasks:save', 'updated');
-
-				} else {
-					// When cancel, need to set the original status on the view.
-					view.model.set('new_status', undefined);
-					view.render('class');
+				title = view.$el.find('[name=task_title_' + model.get('id') + ']').val();
+				if (title && view.model.get('title') !== title) {
+					view.model.set('title', title);
+				} else if (newStatus) {
+					view.model.set('status', newStatus);
+					// view.render('class');
+					// view.model.unset('new_status', {silence: true});
 				}
 
-				view.render();
+				view.model.set('selected', false);
+
+				// T0-DO: Changing render
+				// view.render({
+				//	'editMode': self.editingFormEnable,
+				//	'statusMode': self.changingStatusEnable
+				// });
 			});
 
-			this.editingFormEnable = false;
-			this.changingFormEnable = false;
+			this.broker.trigger('success:tasks:save', 'updated');
+
 		},
 
 		removeTasks: function (action) {
@@ -281,24 +314,21 @@ define('tasks_view', ['app'], function (app) {
 			// Also, after removing tasks or canceling the current action it needs to disable any
 			// 'editMode' in the main view.
 
-			if (action === 'saving') {
-				_.each(this.tasksCollection.where({selected:true}), function (model) {
-					view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
-					view.remove();
-					self._viewsCollection.remove(self._viewsCollection.findWhere({'id': model.get('id')}));
-				});
+			this._editingFormEnable = false;
+			this._changingStatusEnable = false;
 
-				this.tasksCollection.remove(this.tasksCollection.where({selected:true}));
+			_.each(this._selectedTasks(), function (model) {
+				self._getOrCreateTaskView(model).remove();
+				self._viewsCollection.remove(self._viewsCollection.findWhere({'id': model.get('id')}));
+			});
 
-				if (!this.tasksCollection.length) {
-					this.render();
-				}
+			this.tasksCollection.remove(this._selectedTasks());
 
-				this.broker.trigger('success:tasks:save', 'removed');
+			if (!this.tasksCollection.length) {
+				this.render();
 			}
 
-			this.editingFormEnable = false;
-			this.changingFormEnable = false;
+			this.broker.trigger('success:tasks:save', 'removed');
 		},
 
 		changeStatusTasks: function (newStatus) {
@@ -311,30 +341,48 @@ define('tasks_view', ['app'], function (app) {
 			// Also, there's a 'editMode' enable because it's enable the form to change status
 			// of some tasks.
 
-			_.each(this.tasksCollection.where({selected:true}), function (model) {
-				view = self._viewsCollection.findWhere({'id': model.get('id')}).get('view');
+			this._editingFormEnable = false;
+			this._changingStatusEnable = true;
 
-				if (!newStatus) {
-					view.model.set('new_status', undefined);
-				} else {
-					view.model.set('new_status', newStatus);
-				}
+			_.each(this._selectedTasks(), function (model) {
+				view = self._getOrCreateTaskView(model);
 
-				view.render('class');
+				// TO-DO: Check if we still need new_status;
+				// if (newStatus) {
+				//	view.model.set('new_status', status);
+				// } else {
+				//	view.model.unset('new_status');
+				// }
+
+				// T0-DO: Changing render
+				view.render({
+					'editMode': self._editingFormEnable,
+					'statusMode': self._changingStatusEnable,
+					'statusSelected': newStatus
+				});
 			});
-
-			this.changingStatusEnable = true;
 		},
 
-		_getTaskView: function (model) {
+		cancelAction: function () {
+			var self = this, view;
 
-			// Create and return a new task with the model provided.
-			return new TaskView({
-				el: this.$el.find('[task_id=' + model.get('id') + ']'),
-				model: model,
-				className: (model.get('new_status') || model.get('status'))
+			this._editingFormEnable = false;
+			this._changingStatusEnable = false;
+
+			_.each(this.tasksColleciton.where({selected:true}), function (model) {
+				view = self._getOrCreateTaskView(model);
+
+				// TO-DO: Check if we still need new_status;
+				// view.model.unset('new_status', {silence: true});
+				// T0-DO: Changing render
+
+				view.render({
+					'editMode': self._editingFormEnable,
+					'statusMode': self._changingStatusEnable
+				});
 			});
 		}
+		
 	});
 
 });
